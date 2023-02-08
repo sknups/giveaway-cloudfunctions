@@ -1,0 +1,84 @@
+name: Publish Cloud functions artifact
+
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    branches:
+      - 'main'
+  workflow_dispatch:
+
+env:
+  GOOGLE_PROJECT: sknups-org-admin
+  COMPONENT: giveaway-cloudfunctions
+  BUILD_ARTIFACTS_BUCKET: build-artifacts-09c4
+
+jobs:
+  setup-package-publish:
+    name: Setup, Package, Publish
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Auth GCP
+        id: 'auth'
+        uses: 'google-github-actions/auth@v0'
+        with:
+          credentials_json: '${{ secrets.BUILD_ARTIFACTS_BUCKET_ADMIN }}'
+
+      - name: Setup GCP
+        uses: google-github-actions/setup-gcloud@v0
+        with:
+          project_id: ${{ env.GOOGLE_PROJECT }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'npm'
+
+      - name: Configure npm
+        run: |
+          npm config set update-notifier false
+          npm config set audit false
+          npm config set fund false
+
+      - name: Install dependencies
+        run: |
+          npm ci
+
+      - name: Run Lint
+        run: |
+          npm run lint
+
+      - name: Run tests
+        run: |
+          npm test
+
+      - name: Build & Package
+        run: |-
+          npm run build
+          mkdir build
+          cp -a ./dist ./build
+          cp package*.json ./build
+          cd build
+          zip -r "../$GITHUB_SHA.zip" .
+
+      - name: Upload
+        if: github.event_name != 'pull_request'
+        run: |-
+          gsutil cp "$GITHUB_SHA.zip" "gs://$BUILD_ARTIFACTS_BUCKET/$COMPONENT/$GITHUB_SHA.zip"
+
+
+      # Call the API to trigger the workflow that updates the version in wholesale-terraform
+      - name: Deploy
+        if: github.event_name == 'push'
+        uses: benc-uk/workflow-dispatch@v1
+        with:
+          workflow: update_version.yml
+          repo: sknups/wholesale-terraform
+          token:  ${{ secrets.DEPLOY_TOKEN }}
+          inputs: '{ "component": "${{ env.COMPONENT }}", "version": "${{ github.sha }}" }'
