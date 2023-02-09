@@ -14,7 +14,7 @@ export function parsePath(req: Request, res: Response): GiveawayPathParams | nul
 
     const retailer: boolean = parts.includes('retailer');
 
-    if ((!retailer && parts.length < 2) || (retailer && parts.length < 3)) {
+    if ((!retailer && parts.length < 1) || (retailer && parts.length < 2)) {
         res.status(StatusCodes.BAD_REQUEST).send('giveaway code must be provided in path');
         return null;
     }

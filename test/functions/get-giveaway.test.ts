@@ -17,7 +17,7 @@ describe('function - get-giveaway - retailer', () => {
 
     const req = {
         method: 'GET',
-        path: `/giveaway-get/retailer/${giveawayCode}`,
+        path: `/retailer/${giveawayCode}`,
     } as Request;
 
     beforeEach(() => {

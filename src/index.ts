@@ -19,10 +19,6 @@ export const getGiveaway: HttpFunction = async (req, res) => functionWrapper(Get
  * For dev testing only
  */
 export const devRouter: HttpFunction = async (req, res) => {
-    if (req.path.startsWith('/giveaway-get')) {
-        await getGiveaway(req, res);
-        return;
-    }
-
-    res.status(404).send(`Endpoint ${req.path} not found\n`);
+    // TODO find a way to support consistent paths with gcp (gcp strips the function name from the req.path)
+    await getGiveaway(req, res);
 }
