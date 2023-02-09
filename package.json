@@ -4,7 +4,7 @@
   "scripts": {
     "prebuild": "rimraf ./dist",
     "build": "tsc",
-    "start": "tsc -p tsconfig.dev.json && concurrently \"tsc -p tsconfig.dev.json -w\" \"nodemon --watch ./dist --exec GOOGLE_AUTH_TOKEN=$(gcloud auth print-identity-token) NODE_ENV=development functions-framework --target=devRouter\"",
+    "start": "tsc -p tsconfig.dev.json && concurrently \"tsc -p tsconfig.dev.json -w\" \"nodemon --watch ./dist --exec NODE_ENV=development functions-framework --target=devRouter\"",
     "test": "NODE_ENV=development LOG_LEVEL=error jest --config test/jest-config.json",
     "lint": "eslint --ext .js,.ts .",
     "deploy": "scripts/deploy-tmp.sh",
@@ -13,7 +13,6 @@
   "dependencies": {
     "@google-cloud/datastore": "^7.0.0",
     "@google-cloud/functions-framework": "^3.1.2",
-    "@google-cloud/pubsub": "^3.2.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "http-status-codes": "^2.2.0",

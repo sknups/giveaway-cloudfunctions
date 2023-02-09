@@ -19,7 +19,7 @@ export const getGiveaway: HttpFunction = async (req, res) => functionWrapper(Get
  * For dev testing only
  */
 export const devRouter: HttpFunction = async (req, res) => {
-    if (req.path.startsWith('/giveaway-get/')) {
+    if (req.path.startsWith('/giveaway-get')) {
         await getGiveaway(req, res);
         return;
     }
