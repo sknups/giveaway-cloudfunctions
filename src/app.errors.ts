@@ -35,7 +35,7 @@ export function GIVEAWAY_NOT_FOUND(code: string): ErrorReason {
 }
 
 export const UNCATEGORIZED_ERROR: ErrorReason = {
-    code: 'ITEM_00900',
+    code: 'GIVEAWAY_00900',
     message: 'An uncategorized error has occurred',
     statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
 }

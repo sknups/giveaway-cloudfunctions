@@ -11,18 +11,18 @@ const instance = getGiveaway;
 
 describe('function - get-giveaway - retailer', () => {
 
-    const byCodeSpy = jest.spyOn(GiveawayRepository.prototype, 'byCode');
-
+    let res: MockExpressResponse;
+    let byCodeSpy;
     const giveawayCode = 'GIVEAWAY-123456789';
+
     const req = {
         method: 'GET',
-        path: `/retailer/${giveawayCode}`,
+        path: `/giveaway-get/retailer/${giveawayCode}`,
     } as Request;
-
-    let res = new MockExpressResponse();
 
     beforeEach(() => {
         res = new MockExpressResponse();
+        byCodeSpy = jest.spyOn(GiveawayRepository.prototype, 'byCode');
         byCodeSpy.mockReturnValueOnce(Promise.resolve(TEST_ENTITIES.v2));
     });
 
@@ -39,7 +39,7 @@ describe('function - get-giveaway - retailer', () => {
         expect(res._getString()).toContain('giveaway code must be provided in path');
     });
 
-    it.skip('ignores path additional element', async () => {
+    it('ignores path additional element', async () => {
         const req = {
             method: 'GET',
             path: `/retailer/bla/${giveawayCode}`,
@@ -51,7 +51,7 @@ describe('function - get-giveaway - retailer', () => {
         expect(byCodeSpy).toHaveBeenLastCalledWith(giveawayCode);
     });
 
-    it.skip('returns giveaway', async () => {
+    it('returns giveaway', async () => {
         await instance(req, res);
 
         expect(res.statusCode).toEqual(StatusCodes.OK);
@@ -60,14 +60,14 @@ describe('function - get-giveaway - retailer', () => {
         expect(res._getJSON()).toEqual(TEST_DTOS.v2.retailer);
     });
 
-    it.skip('returns 404 if item not found', async () => {
+    it('returns 404 if item not found', async () => {
         byCodeSpy.mockReset();
         byCodeSpy.mockReturnValueOnce(Promise.resolve(null));
 
         await instance(req, res);
 
         expect(res.statusCode).toEqual(StatusCodes.NOT_FOUND);
-        expect(res._getString()).toEqual('Not Found');
+        expect(res._getJSON().code).toEqual('GIVEAWAY_00001');
     })
 
 });

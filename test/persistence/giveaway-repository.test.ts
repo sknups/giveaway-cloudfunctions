@@ -14,12 +14,16 @@ const QUERY_DATA = _toDatastoreEntity(TEST_ENTITIES.v2);
 
 describe('persistence', () => {
 
-    const getSpy = jest.spyOn(Datastore.prototype, 'get');
-
+    let getSpy;
     let instance: GiveawayRepository;
 
     beforeEach(function () {
+        getSpy = jest.spyOn(Datastore.prototype, 'get');
         instance = new GiveawayRepository();
+    });
+
+    afterEach(() => {
+        jest.resetAllMocks();
     });
 
     describe('byCode', () => {
