@@ -11,8 +11,7 @@ export type BaseEntity<K = EntityKey> = {
     /**
      * Unique identifier of the entity, used as the primary key.
      */
-    key: K;
-
+    code: string
 }
 
 export type NamedKeyEntity = BaseEntity<NamedKey>;

@@ -1,3 +1,5 @@
+import { GiveawayState } from '../giveaway-state.dto';
+import { GiveawayType } from '../giveaway-type.dto';
 import { GiveawayDto } from '../giveaway.dto';
 
 /**
@@ -9,5 +11,12 @@ import { GiveawayDto } from '../giveaway.dto';
  */
 
 export class InternalGiveawayDto extends GiveawayDto {
+
+    key: string;
+    type: GiveawayType;
+    state: GiveawayState;
+    config: string;
+    publicKey: string;
+    version: string;
 
 }

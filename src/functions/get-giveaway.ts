@@ -28,7 +28,7 @@ export class GetGiveaway {
         }
 
         logger.debug(`Received request for giveaway-get ${pathParams.key}`);
-        const entity: GiveawayEntity = await GetGiveaway.repository.byCode(pathParams.key);
+        const entity: GiveawayEntity = await GetGiveaway.repository.byCode(pathParams.key, pathParams.retailer);
 
         if (entity === null) {
             logger.debug(`giveaway with code ${pathParams.key} not found`);
@@ -37,7 +37,7 @@ export class GetGiveaway {
 
         const mapper = pathParams.retailer ? new RetailerGiveawayMapper(config.flexUrl) : new InternalGiveawayMapper();
 
-        const giveaway: GiveawayDto = mapper.toDto(entity);
+        const giveaway: GiveawayDto = await mapper.entityToDto(entity);
 
         res.status(StatusCodes.OK).json(giveaway);
     }

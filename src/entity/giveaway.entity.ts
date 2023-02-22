@@ -1,13 +1,13 @@
-import { NamedKeyEntity } from '../helpers/persistence/base.entity';
+import { BaseEntity } from '../helpers/persistence/base.entity'
 
-export type GiveawayEntity = NamedKeyEntity & {
-
+export type GiveawayEntityData = {
     title: string;
     description: string;
     type: string;
-    state: string;
+    state?: string;
     config: string;
     publicKey: string;
     version: string;
-
 }
+
+export type GiveawayEntity = BaseEntity & GiveawayEntityData;

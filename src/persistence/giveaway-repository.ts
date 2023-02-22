@@ -6,15 +6,15 @@ export class GiveawayRepository {
 
     public static context = createContext('claim');
 
-    public async byCode(giveawayCode: string, context?: DatastoreContext): Promise<GiveawayEntity | null> {
+    public async byCode(giveawayCode: string, retailer: boolean, context?: DatastoreContext): Promise<GiveawayEntity | null> {
         logger.debug(`byCode - giveawayCode = ${giveawayCode}`)
 
-        const giveaway: GiveawayEntity = await getEntity(context ?? GiveawayRepository.context, 'giveaway', giveawayCode);
+        const giveaway: GiveawayEntity = await getEntity('giveaway', giveawayCode);
 
-        if (giveaway && giveaway.state === 'ACTIVE') {
-            return giveaway;
-        } else {
+        if (retailer && giveaway.state === "SUSPENDED") {
             return null;
+        } else {
+            return giveaway;
         }
     }
 

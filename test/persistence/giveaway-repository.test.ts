@@ -5,7 +5,7 @@ import { GiveawayRepository } from '../../src/persistence/giveaway-repository';
 
 function _toDatastoreEntity(mappedEntity: NamedKeyEntity): any {
     const result: any = { ...mappedEntity };
-    result[Datastore.KEY] = { name: mappedEntity.key };
+    result[Datastore.KEY] = { name: mappedEntity.code };
     delete result.key;
     return result;
 }
@@ -33,12 +33,12 @@ describe('persistence', () => {
         });
 
         it('uses correct query', async () => {
-            await instance.byCode(TEST_ENTITIES.v2.key);
+            await instance.byCode(TEST_ENTITIES.v2.code, true);
 
             const expectedQuery = {
                 namespace: 'claim',
                 kind: 'giveaway',
-                name: TEST_ENTITIES.v2.key,
+                name: TEST_ENTITIES.v2.code,
             };
 
             expect(getSpy).toHaveBeenCalledTimes(1);
@@ -46,16 +46,16 @@ describe('persistence', () => {
         });
 
         it('transforms results', async () => {
-            const result = await instance.byCode(TEST_ENTITIES.v2.key);
+            const result = await instance.byCode(TEST_ENTITIES.v2.code, true);
 
             expect(result).toEqual(TEST_ENTITIES.v2);
         });
 
-        it('returns null for non ACTIVE state', async () => {
+        it('returns null for non SUSPENDED state and from retailer', async () => {
             getSpy.mockReset();
-            getSpy.mockReturnValueOnce([{ ...QUERY_DATA, state: 'INACTIVE' }] as any);
+            getSpy.mockReturnValueOnce([{ ...QUERY_DATA, state: 'SUSPENDED' }] as any);
 
-            const result = await instance.byCode(TEST_ENTITIES.v2.key);
+            const result = await instance.byCode(TEST_ENTITIES.v2.code, true);
 
             expect(result).toEqual(null);
         });

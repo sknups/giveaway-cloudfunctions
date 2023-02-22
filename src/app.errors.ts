@@ -39,3 +39,34 @@ export const UNCATEGORIZED_ERROR: ErrorReason = {
     message: 'An uncategorized error has occurred',
     statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
 }
+
+
+export const CODE_NOT_FOUND_IN_PATH = (kind: string): ErrorReason => {
+    return {
+        code: 'CAT00401',
+        message: `${kind} code not found in path`,
+        statusCode: StatusCodes.BAD_REQUEST,
+    }
+}
+
+export const HTTP_METHOD_NOT_ALLOWED = (method: string): ErrorReason => {
+    return {
+        code: 'CAT00400',
+        message: `${method} not allowed`,
+        statusCode: StatusCodes.METHOD_NOT_ALLOWED,
+    }
+}
+
+export const ENTITY_NOT_FOUND = (kind: string, code: string): ErrorReason => {
+    return {
+        code: 'CAT00300',
+        message: `Can't find ${kind} with code '${code}'`,
+        statusCode: StatusCodes.NOT_FOUND,
+    }
+}
+
+export const NOT_AVAILABLE_TO_RETAILER: ErrorReason = {
+    code: 'CAT00404',
+    message: 'Not available to retailer',
+    statusCode: StatusCodes.FORBIDDEN,
+}

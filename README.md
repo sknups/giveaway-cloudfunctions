@@ -58,7 +58,7 @@ Get by giveaway code (internal):
 BASE_URL=http://localhost:8080
 GIVEAWAY_CODE=octahedron
 
-curl $BASE_URL/giveaway-get/GIVEAWAY_CODE
+curl $BASE_URL/giveaway-get/$GIVEAWAY_CODE
 ```
 
 Get by giveaway code (retailer):
@@ -67,7 +67,32 @@ Get by giveaway code (retailer):
 BASE_URL=http://localhost:8080
 GIVEAWAY_CODE=octahedron
 
-curl $BASE_URL/giveaway-get/retailer/GIVEAWAY_CODE
+curl $BASE_URL/giveaway-get/retailer/$GIVEAWAY_CODE
+```
+
+### giveaway-save
+
+Create or update a giveaway (internal):
+
+If creating a giveaway, the state will be active
+If updating a giveaway. the state will be unchanged
+
+```bash
+BASE_URL=http://localhost:8080
+GIVEAWAY_CODE=octahedron
+
+curl -X PUT -H 'Content-Type: application/json' $BASE_URL/giveaway-save/test -d '{"title":"Test Giveaway", "description": "test", "type": "SIMPLE", "config": "{'skuEntries':[{'code':'TEST-OCTAHEDRON-GIVEAWAY','"weight"':null}]}", "publicKey": "test", "version": "v2"}'
+```
+
+### giveaway-update-state
+
+Update giveaway state (internal):
+
+```bash
+BASE_URL=http://localhost:8080
+GIVEAWAY_CODE=octahedron
+
+curl -X POST -H 'Content-Type: application/json' $BASE_URL/giveaway-update-state/$GIVEAWAY_CODE -d '{"state": "ACTIVE"}'
 ```
 
 ## Test GCP Deployment
