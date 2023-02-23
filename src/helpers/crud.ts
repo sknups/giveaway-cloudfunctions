@@ -109,7 +109,7 @@ export async function saveInTransaction<
         entity = await getEntity(kind, code, tx);
 
         if (entity) {
-            const updateEntity = await mapper.dtoToUpdateEntity(code, dto);
+            const updateEntity = await mapper.dtoToUpdateEntity(dto);
             const diff = diffPartial(entity, updateEntity);
 
             if (diff.match) {

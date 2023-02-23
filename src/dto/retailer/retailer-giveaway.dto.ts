@@ -9,5 +9,5 @@ import { RetailerGiveawayMediaDto } from './retailer-giveaway-media.dto';
 
 export class RetailerGiveawayDto extends GiveawayDto {
 
-    media?: RetailerGiveawayMediaDto;
+    media: RetailerGiveawayMediaDto;
 }

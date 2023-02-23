@@ -1,4 +1,4 @@
-import { GiveawayEntity } from '../entity/giveaway.entity';
+import { GiveawayEntity, GiveawayEntityData } from '../entity/giveaway.entity';
 import { GiveawayDto } from '../dto/giveaway.dto';
 import { EntityMapper } from './entity.mapper';
 import { SaveGiveawayRequestDto } from '../dto/save-giveaway-request.dto';
@@ -31,16 +31,15 @@ export abstract class AbstractGiveawayMapper<T extends GiveawayDto> implements E
     const state = GiveawayState.ACTIVE;
 
     return {
-      ...(await this.dtoToUpdateEntity(code, dto)),
+      ...(await this.dtoToUpdateEntity(dto)),
       code: code,
       state
     }
   }
 
-  async dtoToUpdateEntity(code: string, dto: SaveGiveawayRequestDto): Promise<GiveawayEntity> {
+  async dtoToUpdateEntity(dto: SaveGiveawayRequestDto): Promise<GiveawayEntityData> {
 
     return {
-      code,
       title: dto.title,
       description: dto.description,
       type: dto.type,

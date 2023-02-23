@@ -44,6 +44,6 @@ export interface EntityMapper<E extends BaseEntity, S, F> {
    * @param dto the "save" DTO to be mapped to a partial entity
    * @returns the partial entity
    */
-  dtoToUpdateEntity(code: string, dto: S): Promise<Partial<E>>;
+  dtoToUpdateEntity(dto: S): Promise<Partial<E>>;
 
 }
