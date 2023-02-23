@@ -10,6 +10,7 @@ import { AllConfig } from 'config/all-config';
 import { GiveawayDto } from '../dto/giveaway.dto';
 import { GiveawayEntity } from '../entity/giveaway.entity';
 import { parsePath } from '../helpers/util';
+import { GiveawayState } from '../dto/giveaway-state.dto';
 
 export class GetGiveaway {
 
@@ -35,9 +36,14 @@ export class GetGiveaway {
             throw new AppError(GIVEAWAY_NOT_FOUND(pathParams.key));
         }
 
+        if (pathParams.retailer && entity.state === GiveawayState.SUSPENDED) {
+            logger.debug(`giveaway with code ${pathParams.key} is suspended`);
+            throw new AppError(GIVEAWAY_NOT_FOUND(pathParams.key));
+        }
+
         const mapper = pathParams.retailer ? new RetailerGiveawayMapper(config.flexUrl) : new InternalGiveawayMapper();
 
-        const giveaway: GiveawayDto = mapper.toDto(entity);
+        const giveaway: GiveawayDto = await mapper.entityToDto(entity);
 
         res.status(StatusCodes.OK).json(giveaway);
     }
