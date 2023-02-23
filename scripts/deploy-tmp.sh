@@ -24,14 +24,14 @@ if [[ -z "$1" || "$1" == "$name" ]]; then
     $common_args \
     --entry-point=saveGiveaway \
     --memory=128MB \
-    --service-account=giveaway-cf-read@drm-apps-01-43b0.iam.gserviceaccount.com
+    --service-account=giveaway-cf-write@drm-apps-01-43b0.iam.gserviceaccount.com
 fi
 
 name=giveaway-update-state-tmp
 if [[ -z "$1" || "$1" == "$name" ]]; then
   gcloud functions deploy $name \
     $common_args \
-    --entry-point=setGiveawayState \
+    --entry-point=updateStateGiveaway \
     --memory=128MB \
-    --service-account=giveaway-cf-read@drm-apps-01-43b0.iam.gserviceaccount.com
+    --service-account=giveaway-cf-write@drm-apps-01-43b0.iam.gserviceaccount.com
 fi

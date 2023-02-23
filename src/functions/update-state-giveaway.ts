@@ -4,7 +4,6 @@ import { StatusCodes } from 'http-status-codes';
 import logger from '../helpers/logger';
 import { AppError, NOT_AVAILABLE_TO_RETAILER } from '../app.errors';
 import { InternalGiveawayMapper } from '../mapper/internal/internal-giveaway-mapper';
-import { AllConfig } from 'config/all-config';
 import { GiveawayEntity } from '../entity/giveaway.entity';
 import { parsePath } from '../helpers/util';
 import { parseAndValidateRequestData } from '../helpers/validation';
@@ -17,7 +16,7 @@ export class UpdateStateGiveaway {
 
     public static repository = createContext('claim');
 
-    public static async handler(req: Request, res: Response, config: AllConfig): Promise<void> {
+    public static async handler(req: Request, res: Response): Promise<void> {
         if (req.method != 'POST') {
             res.status(StatusCodes.METHOD_NOT_ALLOWED).send(`${req.method} not allowed`);
             return;
