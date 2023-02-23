@@ -23,3 +23,8 @@ export function parsePath(req: Request, res: Response): GiveawayPathParams | nul
 
     return { key, retailer };
 }
+
+export function isRetailerRequest(req: Request): boolean {
+    const parts = req.path.split('/');
+    return parts.includes('retailer');
+}

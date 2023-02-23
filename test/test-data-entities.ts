@@ -1,7 +1,7 @@
 import { GiveawayEntity } from '../src/entity/giveaway.entity';
 
 const GIVEAWAY_V2: GiveawayEntity = {
-    "key": "GIVEAWAY-123456789",
+    "code": "GIVEAWAY-123456789",
     "title": "123456789 SKNUPS Giveaway",
     "description": "Amazing SKNUPS Giveaway Description",
     "type": "SIMPLE",

@@ -17,3 +17,21 @@ if [[ -z "$1" || "$1" == "$name" ]]; then
     --memory=128MB \
     --service-account=giveaway-cf-read@drm-apps-01-43b0.iam.gserviceaccount.com
 fi
+
+name=giveaway-save-tmp
+if [[ -z "$1" || "$1" == "$name" ]]; then
+  gcloud functions deploy $name \
+    $common_args \
+    --entry-point=saveGiveaway \
+    --memory=128MB \
+    --service-account=giveaway-cf-write@drm-apps-01-43b0.iam.gserviceaccount.com
+fi
+
+name=giveaway-update-state-tmp
+if [[ -z "$1" || "$1" == "$name" ]]; then
+  gcloud functions deploy $name \
+    $common_args \
+    --entry-point=updateStateGiveaway \
+    --memory=128MB \
+    --service-account=giveaway-cf-write@drm-apps-01-43b0.iam.gserviceaccount.com
+fi
