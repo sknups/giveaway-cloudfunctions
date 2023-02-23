@@ -1,35 +1,36 @@
-import * as sinon from 'sinon';
-
 import { GiveawayEntity } from '../src/entity/giveaway.entity';
 
 export const DEFAULT_DATE_STR = '2022-10-01T10:33:33.000Z';
 export const DEFAULT_DATE = new Date(DEFAULT_DATE_STR);
 export const STUB_TX = 'STUB_TX';
 
-export type Stubs = {
-    startTransaction: sinon.SinonStub,
-    commitTransaction: sinon.SinonStub,
-    rollbackTransaction: sinon.SinonStub,
-    getEntity: sinon.SinonStub,
-    saveEntity: sinon.SinonStub,
-    updateEntity: sinon.SinonStub
-}
+const datastoreHelper = {
+    startTransaction: jest.fn().mockImplementation(()=> {return STUB_TX }),
+    commitTransaction: jest.fn(),
+    rollbackTransaction: jest.fn(),
+    getEntity: jest.fn().mockImplementation((entity: string, code: string) => {
+      if (entity === 'giveaway' && code == 'GIVEAWAY') {
+        return mockGiveawayEntity('GIVEAWAY')
+      }
+      return null;
+    }),
+    saveEntity: jest.fn(),
+    updateEntity: jest.fn(),
+    createContext: jest.fn()
+  }
 
-export function createStubs(): Stubs {
-    const stubs = {
-        startTransaction: sinon.stub(require('../src/helpers/datastore/datastore.helper'), 'startTransaction'),
-        commitTransaction: sinon.stub(require('../src/helpers/datastore/datastore.helper'), 'commitTransaction'),
-        rollbackTransaction: sinon.stub(require('../src/helpers/datastore/datastore.helper'), 'rollbackTransaction'),
-        getEntity: sinon.stub(require('../src/helpers/datastore/datastore.helper'), 'getEntity'),
-        saveEntity: sinon.stub(require('../src/helpers/datastore/datastore.helper'), 'saveEntity'),
-        updateEntity: sinon.stub(require('../src/helpers/datastore/datastore.helper'), 'updateEntity')
-    }
-
-    stubs.startTransaction.onFirstCall().returns(STUB_TX);
-    stubs.getEntity.withArgs('giveaway', 'GIVEAWAY').returns(mockGiveawayEntity('GIVEAWAY'));
-
-    return stubs;
-}
+export const mocks = {
+    datastoreHelper,
+    mockClear: () => {
+      datastoreHelper.getEntity.mockClear();
+      datastoreHelper.saveEntity.mockClear();
+      datastoreHelper.updateEntity.mockClear();
+      datastoreHelper.startTransaction.mockClear();
+      datastoreHelper.commitTransaction.mockClear();
+      datastoreHelper.rollbackTransaction.mockClear();
+      datastoreHelper.createContext.mockClear();
+    },
+  }
 
 export function mockGiveawayEntity(code: string): GiveawayEntity {
     
@@ -50,3 +51,6 @@ export function mockGiveawayEntity(code: string): GiveawayEntity {
         version: "2"
     };
 }
+
+
+jest.mock('../src/helpers/datastore/datastore.helper', () => datastoreHelper);

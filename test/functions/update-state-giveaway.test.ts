@@ -1,25 +1,21 @@
 import './test-env';
+import { mocks } from '../mocks';
 import { http, HttpFunction, Request } from '@google-cloud/functions-framework';
 import * as MockExpressResponse from 'mock-express-response';
-import * as sinon from 'sinon';
 import { getFunction } from '@google-cloud/functions-framework/testing';
 import { updateStateGiveaway } from '../../src';
 import { StatusCodes } from 'http-status-codes';
-import { createStubs, Stubs, STUB_TX } from '../mocks';
 import { SetGiveawayStateRequestDto } from '../../src/dto/set-giveaway-state-request.dto';
 import { GiveawayState } from '../../src/dto/giveaway-state.dto';
 
-http('giveaway-set-state', updateStateGiveaway);
+http('giveaway-update-state', updateStateGiveaway);
 
 let instance: HttpFunction;
-let stubs: Stubs;
 
-function _testBody(): any {
-
-    const body: SetGiveawayStateRequestDto = {
-        state: GiveawayState["SUSPENDED"]
+function _testBody(): SetGiveawayStateRequestDto {
+    return {
+      state: GiveawayState.SUSPENDED
     };
-    return body;
 }
 
 
@@ -36,15 +32,11 @@ async function _sendRequest(
     return res;
 }
 
-describe('function - save-giveaway', () => {
+describe('function - giveaway-update-state', () => {
 
     beforeEach(() => {
-        stubs = createStubs();
-        instance = getFunction('giveaway-set-state') as HttpFunction;
-    });
-
-    afterEach(function () {
-        sinon.restore();
+        mocks.mockClear();
+        instance = getFunction('giveaway-update-state') as HttpFunction;
     });
 
     it('asserts GET method not supported', async () => {
@@ -99,7 +91,7 @@ describe('function - save-giveaway', () => {
         const res = await _sendRequest(body);
 
         expect(res.statusCode).toEqual(StatusCodes.OK);
-        sinon.assert.calledOnce(stubs.getEntity);
+        expect(mocks.datastoreHelper.getEntity).toBeCalledTimes(1);
     });
 
 

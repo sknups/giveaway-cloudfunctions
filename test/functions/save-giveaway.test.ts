@@ -1,25 +1,24 @@
 import './test-env';
+import { mocks, STUB_TX } from '../mocks';
 import { http, HttpFunction, Request } from '@google-cloud/functions-framework';
 import * as MockExpressResponse from 'mock-express-response';
-import * as sinon from 'sinon';
 import { getFunction } from '@google-cloud/functions-framework/testing';
 import { saveGiveaway } from '../../src';
 import { StatusCodes } from 'http-status-codes';
-import { createStubs, Stubs, STUB_TX } from '../mocks';
 import { SaveGiveawayRequestDto } from '../../src/dto/save-giveaway-request.dto';
 import { GiveawayType } from '../../src/dto/giveaway-type.dto';
+import { GiveawayState } from '../../src/dto/giveaway-state.dto';
 
 http('giveaway-save', saveGiveaway);
 
 let instance: HttpFunction;
-let stubs: Stubs;
 
 function _testBody(): any {
 
     const body: SaveGiveawayRequestDto = {
         title: "123456789 SKNUPS Giveaway",
         description: "Amazing SKNUPS Giveaway Description",
-        type: GiveawayType["SIMPLE"],
+        type: GiveawayType.SIMPLE,
         config: "{\"skuEntries\":[{\"code\":\"SKU-123456789\",\"weight\":null}]}",
         publicKey: "-----BEGIN PUBLIC KEY-----\n" +
             "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArYbgztS/BDpFeoVHbfxJ\n" +
@@ -50,12 +49,8 @@ async function _sendRequest(
 describe('function - save-giveaway', () => {
 
     beforeEach(() => {
-        stubs = createStubs();
+        mocks.mockClear()
         instance = getFunction('giveaway-save') as HttpFunction;
-    });
-
-    afterEach(function () {
-        sinon.restore();
     });
 
     it('asserts GET method not supported', async () => {
@@ -131,7 +126,7 @@ describe('function - save-giveaway', () => {
 
     it('asserts description is a string', async () => {
         const res = await _sendRequest({ description: 10 });
-
+    
         expect(res.statusCode).toEqual(StatusCodes.BAD_REQUEST);
         expect(res._getString()).toContain('description must be a string');
     });
@@ -184,13 +179,13 @@ describe('function - save-giveaway', () => {
         expect(res.statusCode).toEqual(StatusCodes.CREATED);
         expect(res._getJSON().created).toEqual(true);
         expect(res._getJSON().updated).toEqual(true);
-        sinon.assert.calledOnce(stubs.getEntity)
-        sinon.assert.calledWithExactly(stubs.getEntity, 'giveaway', 'TEST-NEW-GIVEAWAY', STUB_TX);
-        sinon.assert.calledOnce(stubs.startTransaction);
-        sinon.assert.calledOnce(stubs.commitTransaction);
-        sinon.assert.notCalled(stubs.rollbackTransaction);
-        sinon.assert.calledOnceWithMatch(
-            stubs.saveEntity,
+    
+        expect(mocks.datastoreHelper.getEntity).toBeCalledWith('giveaway', 'TEST-NEW-GIVEAWAY', STUB_TX);
+        expect(mocks.datastoreHelper.startTransaction).toBeCalledTimes(1);
+        expect(mocks.datastoreHelper.commitTransaction).toBeCalledTimes(1);
+        expect(mocks.datastoreHelper.rollbackTransaction).toBeCalledTimes(0);
+
+        expect(mocks.datastoreHelper.saveEntity).toBeCalledWith(
             'giveaway',
             {
                 code: 'TEST-NEW-GIVEAWAY',
@@ -213,18 +208,23 @@ describe('function - save-giveaway', () => {
     });
 
     it('asserts modified giveaway returns 200', async () => {
-        const giveawayUpdates = { title: 'Updated title' };
+        const giveawayUpdates = _testBody();
+        giveawayUpdates.title = 'Updated title';
 
         const res = await _sendRequest(giveawayUpdates);
 
         expect(res.statusCode).toEqual(StatusCodes.OK);
         expect(res._getJSON().created).toEqual(false);
         expect(res._getJSON().updated).toEqual(true);
-        sinon.assert.calledWithExactly(stubs.getEntity, 'giveaway', 'GIVEAWAY', STUB_TX);
-        sinon.assert.calledOnce(stubs.startTransaction);
-        sinon.assert.calledOnce(stubs.commitTransaction);
-        sinon.assert.notCalled(stubs.rollbackTransaction);
-        sinon.assert.calledOnceWithMatch(stubs.saveEntity, 'giveaway', giveawayUpdates, STUB_TX);
+        expect(mocks.datastoreHelper.getEntity).toBeCalledWith('giveaway', 'GIVEAWAY', STUB_TX);
+        expect(mocks.datastoreHelper.startTransaction).toBeCalledTimes(1);
+        expect(mocks.datastoreHelper.commitTransaction).toBeCalledTimes(1);
+        expect(mocks.datastoreHelper.rollbackTransaction).toBeCalledTimes(0);
+        expect(mocks.datastoreHelper.saveEntity).toBeCalledWith( 'giveaway', {
+            ...giveawayUpdates,
+            code: 'GIVEAWAY',
+            state: GiveawayState.ACTIVE,
+        }, STUB_TX);
     });
 
     it('asserts not-modified giveaway does not update datastore and returns 200', async () => {
@@ -233,11 +233,11 @@ describe('function - save-giveaway', () => {
         expect(res.statusCode).toEqual(StatusCodes.OK);
         expect(res._getJSON().created).toEqual(false);
         expect(res._getJSON().updated).toEqual(false);
-        sinon.assert.calledWithExactly(stubs.getEntity, 'giveaway', 'GIVEAWAY', STUB_TX);
-        sinon.assert.calledOnce(stubs.startTransaction);
-        sinon.assert.calledOnce(stubs.commitTransaction);
-        sinon.assert.notCalled(stubs.rollbackTransaction);
-        sinon.assert.notCalled(stubs.saveEntity);
+        expect(mocks.datastoreHelper.getEntity).toBeCalledWith('giveaway', 'GIVEAWAY', STUB_TX);
+        expect(mocks.datastoreHelper.startTransaction).toBeCalledTimes(1);
+        expect(mocks.datastoreHelper.commitTransaction).toBeCalledTimes(1);
+        expect(mocks.datastoreHelper.rollbackTransaction).toBeCalledTimes(0);
+        expect(mocks.datastoreHelper.saveEntity).toBeCalledTimes(0);
     });
 
 
