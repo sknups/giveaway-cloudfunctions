@@ -33,7 +33,7 @@ describe('persistence', () => {
         });
 
         it('uses correct query', async () => {
-            await instance.byCode(TEST_ENTITIES.v2.code, true);
+            await instance.byCode(TEST_ENTITIES.v2.code);
 
             const expectedQuery = {
                 namespace: 'claim',
@@ -46,18 +46,9 @@ describe('persistence', () => {
         });
 
         it('transforms results', async () => {
-            const result = await instance.byCode(TEST_ENTITIES.v2.code, true);
+            const result = await instance.byCode(TEST_ENTITIES.v2.code);
 
             expect(result).toEqual(TEST_ENTITIES.v2);
-        });
-
-        it('returns null for non SUSPENDED state and from retailer', async () => {
-            getSpy.mockReset();
-            getSpy.mockReturnValueOnce([{ ...QUERY_DATA, state: 'SUSPENDED' }] as any);
-
-            const result = await instance.byCode(TEST_ENTITIES.v2.code, true);
-
-            expect(result).toEqual(null);
         });
 
     });

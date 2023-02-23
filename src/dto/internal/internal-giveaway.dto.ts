@@ -12,7 +12,7 @@ import { GiveawayDto } from '../giveaway.dto';
 
 export class InternalGiveawayDto extends GiveawayDto {
 
-    key: string;
+    code: string;
     type: GiveawayType;
     state: GiveawayState;
     config: string;

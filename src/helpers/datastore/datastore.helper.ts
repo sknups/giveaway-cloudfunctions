@@ -6,7 +6,7 @@ let _datastore: Datastore;
 
 export function datastore() {
     if (!_datastore) {
-        _datastore = new Datastore({ namespace: 'giveaway' });
+        _datastore = new Datastore({ namespace: 'claim' });
     }
     return _datastore;
 }
@@ -120,7 +120,7 @@ export async function updateEntityState(kind: string, entity: BaseEntity, tx?: T
 function _mapFromDatastoreEntity<T extends BaseEntity>(entity: Entity): T {
     const mapped = { ...entity };
 
-    // replace the Datastore.KEY with a 'key' property
+    // replace the Datastore.KEY with a 'code' property
     mapped.code = mapped[Datastore.KEY].name ?? mapped[Datastore.KEY].id;
     delete mapped[Datastore.KEY];
 
@@ -138,7 +138,6 @@ function _mapFromDatastoreEntity<T extends BaseEntity>(entity: Entity): T {
 
 function _mapToDatastoreEntity(kind: string, obj: BaseEntity) {
 
-    // console.log(obj.code)
     const datastoreEntity = {
         key: datastore().key([kind, obj.code]), // use obj.code as the datastore key
         data: { ...obj },

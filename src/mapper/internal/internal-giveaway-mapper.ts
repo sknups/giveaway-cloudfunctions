@@ -13,7 +13,7 @@ export class InternalGiveawayMapper extends AbstractGiveawayMapper<InternalGivea
     
         return Promise.resolve({
           ...baseDto,
-          key: entity.code,
+          code: entity.code,
           type: GiveawayType[entity.type],
           state,
           config: entity.config,

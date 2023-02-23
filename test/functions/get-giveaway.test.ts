@@ -48,7 +48,7 @@ describe('function - get-giveaway - retailer', () => {
         await instance(req, res);
 
         expect(byCodeSpy).toHaveBeenCalledTimes(1);
-        expect(byCodeSpy).toHaveBeenLastCalledWith(giveawayCode, true);
+        expect(byCodeSpy).toHaveBeenLastCalledWith(giveawayCode);
     });
 
     it('returns giveaway', async () => {
@@ -56,7 +56,7 @@ describe('function - get-giveaway - retailer', () => {
 
         expect(res.statusCode).toEqual(StatusCodes.OK);
         expect(byCodeSpy).toHaveBeenCalledTimes(1);
-        expect(byCodeSpy).toHaveBeenLastCalledWith(giveawayCode, true);
+        expect(byCodeSpy).toHaveBeenLastCalledWith(giveawayCode);
         expect(res._getJSON()).toEqual(TEST_DTOS.v2.retailer);
     });
 

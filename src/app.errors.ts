@@ -43,7 +43,7 @@ export const UNCATEGORIZED_ERROR: ErrorReason = {
 
 export const CODE_NOT_FOUND_IN_PATH = (kind: string): ErrorReason => {
     return {
-        code: 'CAT00401',
+        code: 'GIVEAWAY_00401',
         message: `${kind} code not found in path`,
         statusCode: StatusCodes.BAD_REQUEST,
     }
@@ -51,7 +51,7 @@ export const CODE_NOT_FOUND_IN_PATH = (kind: string): ErrorReason => {
 
 export const HTTP_METHOD_NOT_ALLOWED = (method: string): ErrorReason => {
     return {
-        code: 'CAT00400',
+        code: 'GIVEAWAY_00400',
         message: `${method} not allowed`,
         statusCode: StatusCodes.METHOD_NOT_ALLOWED,
     }
@@ -59,14 +59,14 @@ export const HTTP_METHOD_NOT_ALLOWED = (method: string): ErrorReason => {
 
 export const ENTITY_NOT_FOUND = (kind: string, code: string): ErrorReason => {
     return {
-        code: 'CAT00300',
+        code: 'GIVEAWAY_00300',
         message: `Can't find ${kind} with code '${code}'`,
         statusCode: StatusCodes.NOT_FOUND,
     }
 }
 
 export const NOT_AVAILABLE_TO_RETAILER: ErrorReason = {
-    code: 'CAT00404',
+    code: 'GIVEAWAY_00404',
     message: 'Not available to retailer',
     statusCode: StatusCodes.FORBIDDEN,
 }

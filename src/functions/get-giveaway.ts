@@ -28,9 +28,9 @@ export class GetGiveaway {
         }
 
         logger.debug(`Received request for giveaway-get ${pathParams.key}`);
-        const entity: GiveawayEntity = await GetGiveaway.repository.byCode(pathParams.key, pathParams.retailer);
+        const entity: GiveawayEntity = await GetGiveaway.repository.byCode(pathParams.key);
 
-        if (entity === null) {
+        if (entity === null || (pathParams.retailer && entity.state === "SUSPENDED")) {
             logger.debug(`giveaway with code ${pathParams.key} not found`);
             throw new AppError(GIVEAWAY_NOT_FOUND(pathParams.key));
         }

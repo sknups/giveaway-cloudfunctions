@@ -29,8 +29,8 @@ function _testBody(): any {
             "CwIDAQAB\n" +
             "-----END PUBLIC KEY-----",
         version: "2"
-      };
-      return body;
+    };
+    return body;
 }
 
 
@@ -79,7 +79,7 @@ describe('function - save-giveaway', () => {
         await instance(req, res);
 
         expect(res.statusCode).toEqual(StatusCodes.BAD_REQUEST);
-        expect(res._getString()).toContain('CAT00401');
+        expect(res._getString()).toContain('GIVEAWAY_00401');
     });
 
     it('asserts retailers can not call', async () => {
