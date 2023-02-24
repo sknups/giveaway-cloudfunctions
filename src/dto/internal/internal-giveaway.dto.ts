@@ -17,6 +17,5 @@ export class InternalGiveawayDto extends GiveawayDto {
     state: GiveawayState;
     config: string;
     publicKey: string;
-    version: string;
 
 }

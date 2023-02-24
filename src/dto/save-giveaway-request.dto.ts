@@ -23,9 +23,5 @@ export class SaveGiveawayRequestDto {
   @IsString()
   @IsNotEmpty()
   public readonly publicKey: string;
-
-  @IsString()
-  @IsNotEmpty()
-  public readonly version: string;
 }
 

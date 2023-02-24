@@ -26,8 +26,7 @@ function _testBody(): any {
             "JmEOjF4nw+cqQy3YjcLvVioZwExFDxk75NfajsdjajdndUNPBSgBdyw5UXJhnlBLlw4FnrD3um\n" +
             "o0sNQJIOlgOvGImkQYi8uvJPrHBeXdTjQOPLi9xQgDR64plxC0aPs3ngTCXWlLm1\n" +
             "CwIDAQAB\n" +
-            "-----END PUBLIC KEY-----",
-        version: "2"
+            "-----END PUBLIC KEY-----"
     };
     return body;
 }
@@ -159,20 +158,6 @@ describe('function - save-giveaway', () => {
         expect(res._getString()).toContain('publicKey must be a string');
     });
 
-    it('asserts version is required', async () => {
-        const res = await _sendRequest({ version: '' });
-
-        expect(res.statusCode).toEqual(StatusCodes.BAD_REQUEST);
-        expect(res._getString()).toContain('version should not be empty');
-    });
-
-    it('asserts version is a string', async () => {
-        const res = await _sendRequest({ version: 10 });
-
-        expect(res.statusCode).toEqual(StatusCodes.BAD_REQUEST);
-        expect(res._getString()).toContain('version must be a string');
-    });
-
     it('asserts new giveaway saved returns 201', async () => {
         const res = await _sendRequest({}, _body => { }, 'TEST-NEW-GIVEAWAY');
 
@@ -200,7 +185,6 @@ describe('function - save-giveaway', () => {
                     "o0sNQJIOlgOvGImkQYi8uvJPrHBeXdTjQOPLi9xQgDR64plxC0aPs3ngTCXWlLm1\n" +
                     "CwIDAQAB\n" +
                     "-----END PUBLIC KEY-----",
-                version: '2',
                 state: 'ACTIVE'
             },
             STUB_TX

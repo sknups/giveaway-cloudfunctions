@@ -17,8 +17,7 @@ export class InternalGiveawayMapper extends AbstractGiveawayMapper<InternalGivea
           type: GiveawayType[entity.type],
           state,
           config: entity.config,
-          publicKey: entity.publicKey,
-          version: entity.version
+          publicKey: entity.publicKey
         })
     }
 
