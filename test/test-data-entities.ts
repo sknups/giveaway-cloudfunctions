@@ -13,8 +13,7 @@ const GIVEAWAY_V2: GiveawayEntity = {
         "JmEOjF4nw+cqQy3YjcLvVioZwExFDxk75NfajsdjajdndUNPBSgBdyw5UXJhnlBLlw4FnrD3um\n" +
         "o0sNQJIOlgOvGImkQYi8uvJPrHBeXdTjQOPLi9xQgDR64plxC0aPs3ngTCXWlLm1\n" +
         "CwIDAQAB\n" +
-        "-----END PUBLIC KEY-----",
-    "version": "2"
+        "-----END PUBLIC KEY-----"
 };
 
 export const TEST_ENTITIES = {

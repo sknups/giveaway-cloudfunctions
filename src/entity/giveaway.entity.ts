@@ -10,7 +10,6 @@ export type GiveawayEntityData = {
     type: string;
     config: string;
     publicKey: string;
-    version: string;
 }
 
 export type GiveawayEntity = BaseEntity & GiveawayEntityData & GiveawayEntityStateData;
