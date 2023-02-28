@@ -70,3 +70,51 @@ export const NOT_AVAILABLE_TO_RETAILER: ErrorReason = {
     message: 'Not available to retailer',
     statusCode: StatusCodes.FORBIDDEN,
 }
+
+export const ALREADY_CLAIMED = (giveaway: string, dropLinkIdentifier: string): ErrorReason => {
+    return {
+        code: 'GIVEAWAY_00500',
+        message: `User has already claimed giveaway ${giveaway} with drop link id ${dropLinkIdentifier}`,
+        statusCode: StatusCodes.FORBIDDEN,
+    }
+}
+
+export const LIMIT_REACHED = (limit: number, giveaway: string, dropLinkIdentifier: string): ErrorReason => {
+    return {
+        code: 'GIVEAWAY_00501',
+        message: `Claim limit ${limit} reached for giveaway ${giveaway} and drop link id ${dropLinkIdentifier}`,
+        statusCode: StatusCodes.FORBIDDEN,
+    }
+}
+
+export const LUCU_DECODE_ERROR = (message: string): ErrorReason => {
+    return {
+        code: 'GIVEAWAY_00502',
+        message: `An error occurred decoding the supplied lucu: ${message}`,
+        statusCode: StatusCodes.BAD_REQUEST, // Most likely the client sent a bad lucu, rather than some internal server fault, so status 4xx
+    }
+}
+
+export const ALL_SKUS_OUT_OF_STOCK = (giveaway: string): ErrorReason => {
+    return {
+        code: 'GIVEAWAY_00503',
+        message: `All SKUs for giveaway ${giveaway} are out of stock`,
+        statusCode: StatusCodes.FORBIDDEN,
+    }
+}
+
+export const ITEM_MANUFACTURE_ERROR = (giveaway: string, sku: string): ErrorReason => {
+    return {
+        code: 'GIVEAWAY_00504',
+        message: `Failed to manufacture an item for giveaway ${giveaway} with SKU ${sku}`,
+        statusCode: StatusCodes.FORBIDDEN,
+    }
+}
+
+export const V1_NOT_SUPPORTED = (giveaway: string): ErrorReason => {
+    return {
+        code: 'GIVEAWAY_00505',
+        message: `Claim v1 using lucu not supported for giveaway ${giveaway}`,
+        statusCode: StatusCodes.FORBIDDEN,
+    }
+}

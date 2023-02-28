@@ -8,7 +8,7 @@ describe('mapper - giveaway - retailer', () => {
     const instance = new RetailerGiveawayMapper('https://flex-dev.sknups.com');
 
     it('creates giveaway dto structure - v2', async () => {
-        expect(await instance.entityToDto(TEST_ENTITIES.v2)).toEqual(TEST_DTOS.v2.retailer)
+        expect(await instance.entityToDto(TEST_ENTITIES.giveaway['test-giveaway'])).toEqual(TEST_DTOS.giveaway.retailer['test-giveaway'])
     });
 
 });

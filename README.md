@@ -25,6 +25,7 @@ Create a `.env` file for dev, eg:
 ```bash
 cat <<EOF > .env
 GCLOUD_PROJECT=drm-apps-01-43b0
+CF_BASE_URL=https://europe-west2-drm-apps-01-43b0.cloudfunctions.net
 FLEX_URL=https://flex-dev.sknups.com
 LOG_FORMAT=simple
 EOF
@@ -93,6 +94,21 @@ BASE_URL=http://localhost:8080
 GIVEAWAY_CODE=octahedron
 
 curl -X POST -H 'Content-Type: application/json' $BASE_URL/giveaway-update-state/$GIVEAWAY_CODE -d '{"state": "ACTIVE"}'
+```
+
+### giveaway-create-claim (v1)
+
+Performs a claim on a given giveaway using a lucu (legacy v1 droplink).
+
+```bash
+BASE_URL=http://localhost:8080
+GIVEAWAY_CODE="cube-fortune"
+
+LUCU_ID="TEST$(date +%s)"
+LUCU=$(npx ts-node scripts/create-lucu.ts dev-pem/$GIVEAWAY_CODE.pem $GIVEAWAY_CODE $LUCU_ID 2)
+USER=devtesting
+
+curl -X POST -H 'Content-Type: application/json' $BASE_URL/giveaway-create-claim -d '{"giveaway":"'$GIVEAWAY_CODE'","user":"'$USER'","claim":"'$LUCU'"}'
 ```
 
 ## Test GCP Deployment

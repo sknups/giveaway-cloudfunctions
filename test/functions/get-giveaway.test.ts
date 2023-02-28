@@ -1,19 +1,17 @@
 import './test-env';
+import { mocks } from '../mocks';
 import { Request } from '@google-cloud/functions-framework';
 import * as MockExpressResponse from 'mock-express-response';
 import { getGiveaway } from '../../src';
 import { StatusCodes } from 'http-status-codes';
-import { TEST_ENTITIES } from '../test-data-entities';
 import { TEST_DTOS } from '../test-data-dtos';
-import { GiveawayRepository } from '../../src/persistence/giveaway-repository';
 
 const instance = getGiveaway;
 
 describe('function - get-giveaway - retailer', () => {
 
     let res: MockExpressResponse;
-    let byCodeSpy;
-    const giveawayCode = 'GIVEAWAY-123456789';
+    const giveawayCode = 'test-giveaway';
 
     const req = {
         method: 'GET',
@@ -21,9 +19,8 @@ describe('function - get-giveaway - retailer', () => {
     } as Request;
 
     beforeEach(() => {
+        mocks.init();
         res = new MockExpressResponse();
-        byCodeSpy = jest.spyOn(GiveawayRepository.prototype, 'byCode');
-        byCodeSpy.mockReturnValueOnce(Promise.resolve(TEST_ENTITIES.v2));
     });
 
     afterEach(() => {
@@ -47,22 +44,21 @@ describe('function - get-giveaway - retailer', () => {
 
         await instance(req, res);
 
-        expect(byCodeSpy).toHaveBeenCalledTimes(1);
-        expect(byCodeSpy).toHaveBeenLastCalledWith(giveawayCode);
+        expect(mocks.datastoreHelper.getEntity).toHaveBeenCalledTimes(1);
+        expect(mocks.datastoreHelper.getEntity).toHaveBeenLastCalledWith('giveaway', giveawayCode);
     });
 
     it('returns giveaway', async () => {
         await instance(req, res);
 
         expect(res.statusCode).toEqual(StatusCodes.OK);
-        expect(byCodeSpy).toHaveBeenCalledTimes(1);
-        expect(byCodeSpy).toHaveBeenLastCalledWith(giveawayCode);
-        expect(res._getJSON()).toEqual(TEST_DTOS.v2.retailer);
+        expect(mocks.datastoreHelper.getEntity).toHaveBeenCalledTimes(1);
+        expect(mocks.datastoreHelper.getEntity).toHaveBeenLastCalledWith('giveaway', giveawayCode);
+        expect(res._getJSON()).toEqual(TEST_DTOS.giveaway.retailer[giveawayCode]);
     });
 
     it('returns 404 if item not found', async () => {
-        byCodeSpy.mockReset();
-        byCodeSpy.mockReturnValueOnce(Promise.resolve(null));
+        const req = { method: 'GET', path: '/retailer/invalid-giveaway-code' } as Request;
 
         await instance(req, res);
 
