@@ -70,6 +70,7 @@ jobs:
           mkdir build
           cp -a ./dist ./build
           cp package*.json ./build
+          cp .npmrc ./build
           cd build
           zip -r "../$GITHUB_SHA.zip" .
 
