@@ -34,6 +34,10 @@ jobs:
         with:
           project_id: ${{ env.GOOGLE_PROJECT }}
 
+      - name: List GCP User
+        run: |
+          gcloud auth list
+
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
