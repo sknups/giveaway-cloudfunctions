@@ -44,7 +44,8 @@ export abstract class AbstractGiveawayMapper<T extends GiveawayDto> implements E
       description: dto.description,
       type: dto.type,
       config: dto.config,
-      publicKey: dto.publicKey
+      publicKey: dto.publicKey ?? null,
+      secret: dto.secret ?? null,
     };
   }
 }

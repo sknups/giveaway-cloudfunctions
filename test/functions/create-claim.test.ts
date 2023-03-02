@@ -6,7 +6,10 @@ import { createClaim } from '../../src';
 import { StatusCodes } from 'http-status-codes';
 import * as fs from 'fs';
 import { ItemDto } from '../../src/client/item.client';
+import { TEST_GIVEAWAY_KEY } from '../test-data-entities';
+import { ClaimEntity } from '../../src/entity/claim.entity';
 const droplinksLegacy = import('@sknups/drop-links-legacy');
+const droplinks = import('@sknups/drop-links');
 
 async function _createUnrestrictedLucu(keyFile: string, giveaway: string, identifier: string) {
 
@@ -26,9 +29,36 @@ async function _createLimitedLucu(keyFile: string, giveaway: string, identifier:
 
 };
 
+async function _createUnrestrictedClaim(key: string, giveaway: string, identifier?: number) {
+
+  const lib = await droplinks;
+  const dropLink = lib.DropLinks.createUnrestrictedDropLink(key, giveaway, identifier);
+  return dropLink.claim;
+
+};
+
+async function _createLimitedClaim(key: string, giveaway: string, limit: number, identifier?: number) {
+
+  const lib = await droplinks;
+  const dropLink = lib.DropLinks.createLimitedDropLink(key, giveaway, identifier, limit);
+  return dropLink.claim;
+
+};
+
+function _claimEntity(overrides?: Partial<ClaimEntity>): ClaimEntity {
+  return {
+    code: 'aaaaa11111',
+    dropLinkIdentifier: 'test-droplink-id',
+    giveawayCode: 'test-giveaway',
+    user: 'test-user',
+    ...overrides,
+  };
+}
+
 const UNRESTRICTED_LUCU = _createUnrestrictedLucu('dev-pem/tetrahedron.pem', 'test-giveaway', 'test-unrestricted-droplink');
 const UNRESTRICTED_LUCU2 = _createUnrestrictedLucu('dev-pem/tetrahedron.pem', 'test-giveaway2', 'test-unrestricted-droplink');
 const RESTRICTED_LUCU_LIMIT_2 = _createLimitedLucu('dev-pem/tetrahedron.pem', 'test-giveaway', 'test-unrestricted-droplink', 2);
+const UNRESTRICTED_CLAIM = _createUnrestrictedClaim(TEST_GIVEAWAY_KEY, 'test-giveaway');
 
 describe('function - create-claim', () => {
 
@@ -164,6 +194,78 @@ describe('function - create-claim', () => {
     });
   });
 
+  describe('drop link v2', () => {
+    it('redeem v2 returns 201 CREATED', async () => {
+      const dummyDto: ItemDto = { sku: 'TEST-TETRAHEDRON-GIVEAWAY', token: 'aaaaa11111' };
+      mocks.itemClient.createItem.mockReturnValueOnce(dummyDto);
+
+      req.body.claim = await UNRESTRICTED_CLAIM;
+
+      await instance(req, res);
+
+      expect(res.statusCode).toEqual(StatusCodes.CREATED);
+      expect(mocks.itemClient.createItem).toHaveBeenCalledTimes(1);
+      expect(mocks.datastoreHelper.saveEntity).toHaveBeenLastCalledWith(
+        'claim',
+        _claimEntity({ dropLinkIdentifier: 'unrestricted-0' }),
+      );
+      expect(mocks.datastoreHelper.saveEntity).toHaveBeenCalledTimes(1);
+    });
+
+    it('redeem v2 uses correct identifier', async () => {
+      const dummyDto: ItemDto = { sku: 'TEST-TETRAHEDRON-GIVEAWAY', token: 'aaaaa11111' };
+      mocks.itemClient.createItem.mockReturnValueOnce(dummyDto);
+
+      req.body.claim = await _createUnrestrictedClaim(TEST_GIVEAWAY_KEY, 'test-giveaway', 15);
+
+      await instance(req, res);
+
+      expect(res.statusCode).toEqual(StatusCodes.CREATED);
+      expect(mocks.itemClient.createItem).toHaveBeenCalledTimes(1);
+      expect(mocks.datastoreHelper.saveEntity).toHaveBeenLastCalledWith(
+        'claim',
+        _claimEntity({ dropLinkIdentifier: 'unrestricted-f' }),
+      );
+      expect(mocks.datastoreHelper.saveEntity).toHaveBeenCalledTimes(1);
+    });
+
+    it('redeem limited v2 returns 201 CREATED', async () => {
+      const dummyDto: ItemDto = { sku: 'TEST-TETRAHEDRON-GIVEAWAY', token: 'aaaaa11111' };
+      mocks.itemClient.createItem.mockReturnValueOnce(dummyDto);
+      mocks.datastoreHelper.countEntities.mockReturnValue(1);
+
+      req.body.claim = await _createLimitedClaim(TEST_GIVEAWAY_KEY, 'test-giveaway', 2);
+
+      await instance(req, res);
+
+      expect(res.statusCode).toEqual(StatusCodes.CREATED);
+      expect(mocks.itemClient.createItem).toHaveBeenCalledTimes(1);
+      expect(mocks.datastoreHelper.saveEntity).toHaveBeenLastCalledWith(
+        'claim',
+        _claimEntity({ dropLinkIdentifier: 'limited-00000' }),
+      );
+      expect(mocks.datastoreHelper.saveEntity).toHaveBeenCalledTimes(1);
+    });
+
+    it('redeem limited v2 uses correct identifier', async () => {
+      const dummyDto: ItemDto = { sku: 'TEST-TETRAHEDRON-GIVEAWAY', token: 'aaaaa11111' };
+      mocks.itemClient.createItem.mockReturnValueOnce(dummyDto);
+      mocks.datastoreHelper.countEntities.mockReturnValue(1);
+
+      req.body.claim = await _createLimitedClaim(TEST_GIVEAWAY_KEY, 'test-giveaway', 2, 11223);
+
+      await instance(req, res);
+
+      expect(res.statusCode).toEqual(StatusCodes.CREATED);
+      expect(mocks.itemClient.createItem).toHaveBeenCalledTimes(1);
+      expect(mocks.datastoreHelper.saveEntity).toHaveBeenLastCalledWith(
+        'claim',
+        _claimEntity({ dropLinkIdentifier: 'limited-02bd7' }),
+      );
+      expect(mocks.datastoreHelper.saveEntity).toHaveBeenCalledTimes(1);
+    });
+  });
+
   describe('drop link v1 - error scenarios', () => {
     it('malformed lucu returns 400 BAD_REQUEST', async () => {
       const lucu = await UNRESTRICTED_LUCU;
@@ -215,6 +317,65 @@ describe('function - create-claim', () => {
       const fullLucu: string = await UNRESTRICTED_LUCU;
       const lucuWithShortenedSig = fullLucu.substring(0, fullLucu.length - 10);
       req.body.claim = lucuWithShortenedSig;
+
+      await instance(req, res);
+
+      expect(res.statusCode).toBe(StatusCodes.BAD_REQUEST);
+    });
+  });
+
+  describe('drop link v2 - error scenarios', () => {
+    beforeEach(async () => {
+      req.body.claim = await UNRESTRICTED_CLAIM;
+    });
+
+    it('malformed claim code returns 400 BAD_REQUEST', async () => {
+      req.body.claim = 'xxxxx' + req.body.claim;
+
+      await instance(req, res);
+
+      expect(res.statusCode).toBe(StatusCodes.BAD_REQUEST);
+    });
+
+    it('giveaway mismatch in claim code returns 400 BAD_REQUEST', async () => {
+      req.body.claim = await _createUnrestrictedClaim(TEST_GIVEAWAY_KEY, 'test-giveaway-mismatch');
+
+      await instance(req, res);
+
+      expect(res.statusCode).toBe(StatusCodes.BAD_REQUEST);
+    });
+
+    it('invalid data in lucu returns 400 BAD_REQUEST', async () => {
+      req.body.claim = 'aHR0cHM6Ly9za251cHMvY3ViZS1mb3J0dW5lP2lkPVRFU1QxNjc3NTg4ODkzYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFh';
+
+      await instance(req, res);
+
+      expect(res.statusCode).toBe(StatusCodes.BAD_REQUEST);
+    });
+
+    it('invalid secret returns 400 BAD_REQUEST', async () => {
+      req.body.giveaway = 'invalid-secret-key';
+      req.body.claim = await _createUnrestrictedClaim(TEST_GIVEAWAY_KEY, 'invalid-secret-key');
+
+      await instance(req, res);
+
+      // This should technicaly be a 5xx error, but the drop links library does not provide sufficient error context to determine the problem
+      expect(res.statusCode).toBe(StatusCodes.BAD_REQUEST);
+    });
+
+    it('null secret returns 403 FORBIDDEN', async () => {
+      req.body.giveaway = 'null-secret-key';
+      req.body.claim = await _createUnrestrictedClaim(TEST_GIVEAWAY_KEY, 'null-secret-key');
+
+      await instance(req, res);
+
+      expect(res._getJSON()).toMatchObject({ code: 'GIVEAWAY_00506' }); //V2_NOT_SUPPORTED
+      expect(res.statusCode).toBe(StatusCodes.FORBIDDEN);
+    });
+
+    it('claim with wrong key returns 400 BAD_REQUEST', async () => {
+      const key = '00' + TEST_GIVEAWAY_KEY.substring(2);
+      req.body.claim = await _createUnrestrictedClaim(key, 'test-giveaway');
 
       await instance(req, res);
 

@@ -1,6 +1,7 @@
-import { AppError, LUCU_DECODE_ERROR } from '../app.errors';
+import { AppError, CLAIM_CODE_DECODE_ERROR, LUCU_DECODE_ERROR } from '../app.errors';
 import { SkuEntry } from '../mapper/giveaway-config-json-parser';
 const droplinksLegacy = import('@sknups/drop-links-legacy');
+const droplinks = import('@sknups/drop-links');
 
 /**
  * Given a list of weighted SKU, sorts them randomly with a bias towards the weight.
@@ -91,6 +92,38 @@ export const decodeClaimV1: ClaimDecoder = async (giveaway, lucu, key) => {
     return result;
   } catch (e) {
     throw new AppError(LUCU_DECODE_ERROR(e.message), e);
+  }
+
+};
+
+/**
+ * Decodes a v2 drop link (claim code).
+ */
+export const decodeClaimV2: ClaimDecoder = async (giveaway, claim, key) => {
+
+  const lib = await droplinks;
+
+  try {
+    const decodedClaim = lib.DropLinks.decode(giveaway, claim, key);
+
+    let result: DropLinkData;
+
+    const hexIdentifier = decodedClaim.identifier.toString(16);
+
+    if (decodedClaim instanceof lib.UnrestrictedDropLink) {
+      result = {
+        identifier: `unrestricted-${hexIdentifier}`,
+      }
+    } else {
+      result = {
+        identifier: `limited-${hexIdentifier.padStart(5, '0')}`,
+        limit: decodedClaim.limit,
+      }
+    }
+
+    return result;
+  } catch (e) {
+    throw new AppError(CLAIM_CODE_DECODE_ERROR(claim, e.message), e);
   }
 
 };
