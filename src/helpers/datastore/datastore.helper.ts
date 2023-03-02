@@ -1,5 +1,6 @@
 import { Datastore, Entity, Transaction } from '@google-cloud/datastore';
 import { BaseEntity } from '../persistence/base.entity';
+import { Filter } from '../persistence/filter';
 
 let _datastoreNamespace: string;
 let _datastore: Datastore;
@@ -58,6 +59,31 @@ export async function getEntity<T extends BaseEntity>(kind: string, code: string
     }
 
     return _mapFromDatastoreEntity<T>(entity);
+}
+
+export async function findEntities<T extends BaseEntity>(kind: string, filters: Filter[], tx?: TransactionWrapper): Promise<T[]> {
+    const ds = _datastoreOrTx(tx);
+
+    const query = ds.createQuery(kind);
+    query.filters = filters;
+
+    const [result] = await ds.runQuery(query);
+
+    return result.map(entity => _mapFromDatastoreEntity(entity));
+}
+
+export async function countEntities(kind: string, filters: Filter[], tx?: TransactionWrapper): Promise<number> {
+    const ds = _datastoreOrTx(tx);
+
+    const query = ds.createQuery(kind);
+    query.filters = filters;
+
+    const countQuery = ds.createAggregationQuery(query)
+        .count('count');
+
+    const [result] = await ds.runAggregationQuery(countQuery);
+
+    return result[0].count;
 }
 
 /**
@@ -140,7 +166,7 @@ function _mapToDatastoreEntity(kind: string, obj: BaseEntity) {
 
     const datastoreEntity = {
         key: datastore().key([kind, obj.code]), // use obj.code as the datastore key
-        data: { ...obj },
+        data: { ...obj } as { code?: string },
     };
     delete datastoreEntity.data.code; // we don't want to persist the key as an additional 'code' column
 

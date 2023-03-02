@@ -14,7 +14,7 @@ let instance: HttpFunction;
 
 function _testBody(): SetGiveawayStateRequestDto {
     return {
-      state: GiveawayState.SUSPENDED
+        state: GiveawayState.SUSPENDED
     };
 }
 
@@ -22,7 +22,7 @@ function _testBody(): SetGiveawayStateRequestDto {
 async function _sendRequest(
     bodyOverrides: any = {},
     bodyModifier = (_body: any) => { },
-    code: string = 'GIVEAWAY',
+    code: string = 'test-giveaway',
 ): Promise<MockExpressResponse> {
     const body = { ..._testBody(), ...bodyOverrides };
     bodyModifier(body);
@@ -35,8 +35,12 @@ async function _sendRequest(
 describe('function - giveaway-update-state', () => {
 
     beforeEach(() => {
-        mocks.mockClear();
+        mocks.init();
         instance = getFunction('giveaway-update-state') as HttpFunction;
+    });
+
+    afterEach(() => {
+        jest.resetAllMocks();
     });
 
     it('asserts GET method not supported', async () => {

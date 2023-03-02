@@ -10,7 +10,7 @@ function _toDatastoreEntity(mappedEntity: NamedKeyEntity): any {
     return result;
 }
 
-const QUERY_DATA = _toDatastoreEntity(TEST_ENTITIES.v2);
+const QUERY_DATA = _toDatastoreEntity(TEST_ENTITIES.giveaway['test-giveaway']);
 
 describe('persistence', () => {
 
@@ -33,12 +33,12 @@ describe('persistence', () => {
         });
 
         it('uses correct query', async () => {
-            await instance.byCode(TEST_ENTITIES.v2.code);
+            await instance.byCode('test-giveaway');
 
             const expectedQuery = {
                 namespace: 'claim',
                 kind: 'giveaway',
-                name: TEST_ENTITIES.v2.code,
+                name: 'test-giveaway',
             };
 
             expect(getSpy).toHaveBeenCalledTimes(1);
@@ -46,9 +46,9 @@ describe('persistence', () => {
         });
 
         it('transforms results', async () => {
-            const result = await instance.byCode(TEST_ENTITIES.v2.code);
+            const result = await instance.byCode('test-giveaway');
 
-            expect(result).toEqual(TEST_ENTITIES.v2);
+            expect(result).toEqual(TEST_ENTITIES.giveaway['test-giveaway']);
         });
 
     });

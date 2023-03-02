@@ -1,6 +1,6 @@
 export type SkuEntry = {
     code: string;
-    weight: string | null;
+    weight: number | null;
 }
 
 export type GiveawayConfig = {

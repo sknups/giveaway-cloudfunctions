@@ -1,21 +1,32 @@
 import { GiveawayEntity } from '../src/entity/giveaway.entity';
 
-const GIVEAWAY_V2: GiveawayEntity = {
-    "code": "GIVEAWAY-123456789",
-    "title": "123456789 SKNUPS Giveaway",
-    "description": "Amazing SKNUPS Giveaway Description",
-    "type": "SIMPLE",
-    "state": "ACTIVE",
-    "config": "{\"skuEntries\":[{\"code\":\"SKU-123456789\",\"weight\":null}]}",
-    "publicKey": "-----BEGIN PUBLIC KEY-----\n" +
-        "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArYbgztS/BDpFeoVHbfxJ\n" +
-        "Dsuqfltk0B88uSNFpzrv+EtA7Q7CksDafr99aj+uv6Dhwa86p11fqi+CagElyCyn\n" +
-        "JmEOjF4nw+cqQy3YjcLvVioZwExFDxk75NfajsdjajdndUNPBSgBdyw5UXJhnlBLlw4FnrD3um\n" +
-        "o0sNQJIOlgOvGImkQYi8uvJPrHBeXdTjQOPLi9xQgDR64plxC0aPs3ngTCXWlLm1\n" +
-        "CwIDAQAB\n" +
-        "-----END PUBLIC KEY-----"
-};
+const TEST_GIVEAWAY: GiveawayEntity = {
+    code: 'test-giveaway',
+    config: '{"skuEntries":[{"code":"TEST-TETRAHEDRON-GIVEAWAY","weight":null}]}',
+    description: 'Claim your free SKN now',
+    publicKey: '-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzooSe3/zX9AC6Pe0h9+v\n6WazUblC2MDf5QEjzdVMKs9cK/xJK3uz/yzfetbLv1XUtSnLQpmkSwlrb+GbidUu\nHxyZMPnUXrcPHAw9nJC+9L7+ICjSKMzKQn0mNws0Jq2bVj6+U5A6b5TnMsrzq91t\nQXw415uidu+qzDV+xmFfHN0jT4w63hV+jcwKSMrtXQs2NE0MxuRENbNr9bogsYP8\nSXdxCDgg2WFCKIZzE0K13hJTKjqJm1PhnJU44PFCj/bZfdv4yHBXNiTEM5kZ9GxU\n2+fTKZJgXLyy5EUV2jzj7Y5objSA9vbkYkKX/R98CnxYEMs64r5zNW4ft2kINpOx\nWwIDAQAB\n-----END PUBLIC KEY-----',
+    state: 'ACTIVE',
+    title: 'SKNUPS Giveaway',
+    type: 'SIMPLE',
+}
 
 export const TEST_ENTITIES = {
-    v2: GIVEAWAY_V2
+    giveaway: {
+        'test-giveaway': TEST_GIVEAWAY,
+        'invalid-public-key': {
+            ...TEST_GIVEAWAY,
+            code: 'invalid-public-key',
+            publicKey: 'invalid',
+        },
+        'null-public-key': {
+            ...TEST_GIVEAWAY,
+            code: 'null-public-key',
+            publicKey: null,
+        },
+        'inactive': {
+            ...TEST_GIVEAWAY,
+            code: 'inactive',
+            state: 'INACTIVE',
+        }
+    }
 }

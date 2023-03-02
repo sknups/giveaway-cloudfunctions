@@ -46,6 +46,12 @@ jobs:
           npm config set audit false
           npm config set fund false
 
+      - name: Authenticate Artifact Registry
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ steps.auth.outputs.credentials_file_path }}
+        run: |
+          npm run auth
+
       - name: Install dependencies
         run: |
           npm ci

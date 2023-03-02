@@ -10,7 +10,7 @@ import logger from './logger';
 import { parseAndValidateRequestData } from './validation';
 
 export function getCodeFromPath(kind: string, req: Request): string {
-    const code: string = req.path.split('/').pop();
+    const code: string | undefined = req.path.split('/').pop();
 
     if (!code || code.length === 0) {
         throw new AppError(CODE_NOT_FOUND_IN_PATH(kind));
@@ -49,7 +49,7 @@ export async function getAndMapEntity<
 
     logger.debug(`Received get ${kind} request for '${code}'`);
 
-    const entity: E = await getEntity(mapper.entityKind(), code);
+    const entity: E | null = await getEntity(mapper.entityKind(), code);
 
 
     if (!entity) {
@@ -100,7 +100,7 @@ export async function saveInTransaction<
 
     const tx = await startTransaction();
 
-    let entity: E;
+    let entity: E | null;
     let created = false;
     let updated = true;
 

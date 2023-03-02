@@ -2,7 +2,7 @@ import { Request } from '@google-cloud/functions-framework';
 import { Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import logger from '../helpers/logger';
-import { AppError, NOT_AVAILABLE_TO_RETAILER } from '../app.errors';
+import { AppError, ENTITY_NOT_FOUND, NOT_AVAILABLE_TO_RETAILER } from '../app.errors';
 import { InternalGiveawayMapper } from '../mapper/internal/internal-giveaway-mapper';
 import { GiveawayEntity } from '../entity/giveaway.entity';
 import { parsePath } from '../helpers/util';
@@ -35,7 +35,10 @@ export class UpdateStateGiveaway {
         const requestDto: SetGiveawayStateRequestDto = await parseAndValidateRequestData(SetGiveawayStateRequestDto, req);
 
         logger.debug(`Received request for giveaway-set-state ${pathParams.key}`);
-        const giveaway: GiveawayEntity = await getEntity('giveaway', pathParams.key);
+        const giveaway: GiveawayEntity | null = await getEntity('giveaway', pathParams.key);
+        if (!giveaway) {
+            throw new AppError(ENTITY_NOT_FOUND('giveaway', pathParams.key));
+          }
 
         giveaway.state = requestDto.state;
 

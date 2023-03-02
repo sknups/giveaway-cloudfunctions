@@ -16,17 +16,11 @@ let instance: HttpFunction;
 function _testBody(): any {
 
     const body: SaveGiveawayRequestDto = {
-        title: "123456789 SKNUPS Giveaway",
-        description: "Amazing SKNUPS Giveaway Description",
+        title: 'SKNUPS Giveaway',
+        description: 'Claim your free SKN now',
         type: GiveawayType.SIMPLE,
-        config: "{\"skuEntries\":[{\"code\":\"SKU-123456789\",\"weight\":null}]}",
-        publicKey: "-----BEGIN PUBLIC KEY-----\n" +
-            "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArYbgztS/BDpFeoVHbfxJ\n" +
-            "Dsuqfltk0B88uSNFpzrv+EtA7Q7CksDafr99aj+uv6Dhwa86p11fqi+CagElyCyn\n" +
-            "JmEOjF4nw+cqQy3YjcLvVioZwExFDxk75NfajsdjajdndUNPBSgBdyw5UXJhnlBLlw4FnrD3um\n" +
-            "o0sNQJIOlgOvGImkQYi8uvJPrHBeXdTjQOPLi9xQgDR64plxC0aPs3ngTCXWlLm1\n" +
-            "CwIDAQAB\n" +
-            "-----END PUBLIC KEY-----"
+        config: '{"skuEntries":[{"code":"TEST-TETRAHEDRON-GIVEAWAY","weight":null}]}',
+        publicKey: '-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzooSe3/zX9AC6Pe0h9+v\n6WazUblC2MDf5QEjzdVMKs9cK/xJK3uz/yzfetbLv1XUtSnLQpmkSwlrb+GbidUu\nHxyZMPnUXrcPHAw9nJC+9L7+ICjSKMzKQn0mNws0Jq2bVj6+U5A6b5TnMsrzq91t\nQXw415uidu+qzDV+xmFfHN0jT4w63hV+jcwKSMrtXQs2NE0MxuRENbNr9bogsYP8\nSXdxCDgg2WFCKIZzE0K13hJTKjqJm1PhnJU44PFCj/bZfdv4yHBXNiTEM5kZ9GxU\n2+fTKZJgXLyy5EUV2jzj7Y5objSA9vbkYkKX/R98CnxYEMs64r5zNW4ft2kINpOx\nWwIDAQAB\n-----END PUBLIC KEY-----',
     };
     return body;
 }
@@ -35,7 +29,7 @@ function _testBody(): any {
 async function _sendRequest(
     bodyOverrides: any = {},
     bodyModifier = (_body: any) => { },
-    code: string = 'GIVEAWAY',
+    code: string = 'test-giveaway',
 ): Promise<MockExpressResponse> {
     const body = { ..._testBody(), ...bodyOverrides };
     bodyModifier(body);
@@ -48,8 +42,12 @@ async function _sendRequest(
 describe('function - save-giveaway', () => {
 
     beforeEach(() => {
-        mocks.mockClear()
+        mocks.init();
         instance = getFunction('giveaway-save') as HttpFunction;
+    });
+
+    afterEach(() => {
+        jest.resetAllMocks();
     });
 
     it('asserts GET method not supported', async () => {
@@ -125,7 +123,7 @@ describe('function - save-giveaway', () => {
 
     it('asserts description is a string', async () => {
         const res = await _sendRequest({ description: 10 });
-    
+
         expect(res.statusCode).toEqual(StatusCodes.BAD_REQUEST);
         expect(res._getString()).toContain('description must be a string');
     });
@@ -164,7 +162,7 @@ describe('function - save-giveaway', () => {
         expect(res.statusCode).toEqual(StatusCodes.CREATED);
         expect(res._getJSON().created).toEqual(true);
         expect(res._getJSON().updated).toEqual(true);
-    
+
         expect(mocks.datastoreHelper.getEntity).toBeCalledWith('giveaway', 'TEST-NEW-GIVEAWAY', STUB_TX);
         expect(mocks.datastoreHelper.startTransaction).toBeCalledTimes(1);
         expect(mocks.datastoreHelper.commitTransaction).toBeCalledTimes(1);
@@ -174,17 +172,11 @@ describe('function - save-giveaway', () => {
             'giveaway',
             {
                 code: 'TEST-NEW-GIVEAWAY',
-                title: '123456789 SKNUPS Giveaway',
-                description: 'Amazing SKNUPS Giveaway Description',
+                title: 'SKNUPS Giveaway',
+                description: 'Claim your free SKN now',
                 type: 'SIMPLE',
-                config: '{"skuEntries":[{"code":"SKU-123456789","weight":null}]}',
-                publicKey: "-----BEGIN PUBLIC KEY-----\n" +
-                    "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArYbgztS/BDpFeoVHbfxJ\n" +
-                    "Dsuqfltk0B88uSNFpzrv+EtA7Q7CksDafr99aj+uv6Dhwa86p11fqi+CagElyCyn\n" +
-                    "JmEOjF4nw+cqQy3YjcLvVioZwExFDxk75NfajsdjajdndUNPBSgBdyw5UXJhnlBLlw4FnrD3um\n" +
-                    "o0sNQJIOlgOvGImkQYi8uvJPrHBeXdTjQOPLi9xQgDR64plxC0aPs3ngTCXWlLm1\n" +
-                    "CwIDAQAB\n" +
-                    "-----END PUBLIC KEY-----",
+                config: '{"skuEntries":[{"code":"TEST-TETRAHEDRON-GIVEAWAY","weight":null}]}',
+                publicKey: '-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzooSe3/zX9AC6Pe0h9+v\n6WazUblC2MDf5QEjzdVMKs9cK/xJK3uz/yzfetbLv1XUtSnLQpmkSwlrb+GbidUu\nHxyZMPnUXrcPHAw9nJC+9L7+ICjSKMzKQn0mNws0Jq2bVj6+U5A6b5TnMsrzq91t\nQXw415uidu+qzDV+xmFfHN0jT4w63hV+jcwKSMrtXQs2NE0MxuRENbNr9bogsYP8\nSXdxCDgg2WFCKIZzE0K13hJTKjqJm1PhnJU44PFCj/bZfdv4yHBXNiTEM5kZ9GxU\n2+fTKZJgXLyy5EUV2jzj7Y5objSA9vbkYkKX/R98CnxYEMs64r5zNW4ft2kINpOx\nWwIDAQAB\n-----END PUBLIC KEY-----',
                 state: 'ACTIVE'
             },
             STUB_TX
@@ -200,13 +192,13 @@ describe('function - save-giveaway', () => {
         expect(res.statusCode).toEqual(StatusCodes.OK);
         expect(res._getJSON().created).toEqual(false);
         expect(res._getJSON().updated).toEqual(true);
-        expect(mocks.datastoreHelper.getEntity).toBeCalledWith('giveaway', 'GIVEAWAY', STUB_TX);
+        expect(mocks.datastoreHelper.getEntity).toBeCalledWith('giveaway', 'test-giveaway', STUB_TX);
         expect(mocks.datastoreHelper.startTransaction).toBeCalledTimes(1);
         expect(mocks.datastoreHelper.commitTransaction).toBeCalledTimes(1);
         expect(mocks.datastoreHelper.rollbackTransaction).toBeCalledTimes(0);
-        expect(mocks.datastoreHelper.saveEntity).toBeCalledWith( 'giveaway', {
+        expect(mocks.datastoreHelper.saveEntity).toBeCalledWith('giveaway', {
             ...giveawayUpdates,
-            code: 'GIVEAWAY',
+            code: 'test-giveaway',
             state: GiveawayState.ACTIVE,
         }, STUB_TX);
     });
@@ -217,7 +209,7 @@ describe('function - save-giveaway', () => {
         expect(res.statusCode).toEqual(StatusCodes.OK);
         expect(res._getJSON().created).toEqual(false);
         expect(res._getJSON().updated).toEqual(false);
-        expect(mocks.datastoreHelper.getEntity).toBeCalledWith('giveaway', 'GIVEAWAY', STUB_TX);
+        expect(mocks.datastoreHelper.getEntity).toBeCalledWith('giveaway', 'test-giveaway', STUB_TX);
         expect(mocks.datastoreHelper.startTransaction).toBeCalledTimes(1);
         expect(mocks.datastoreHelper.commitTransaction).toBeCalledTimes(1);
         expect(mocks.datastoreHelper.rollbackTransaction).toBeCalledTimes(0);
