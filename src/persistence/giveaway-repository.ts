@@ -9,7 +9,7 @@ export class GiveawayRepository {
     public async byCode(giveawayCode: string): Promise<GiveawayEntity | null> {
         logger.debug(`byCode - giveawayCode = ${giveawayCode}`)
 
-        const giveaway: GiveawayEntity = await getEntity('giveaway', giveawayCode);
+        const giveaway: GiveawayEntity | null = await getEntity('giveaway', giveawayCode);
 
         return giveaway;
     }

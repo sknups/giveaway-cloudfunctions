@@ -16,7 +16,7 @@ export class ValidationError extends Error {
  * @returns the parsed, transformed and validated object
  * @throws ValidationError if the validation fails
  */
-export async function parseAndValidateRequestData<T extends object>(dtoType: ClassConstructor<T>, req: Request): Promise<T | null> {
+export async function parseAndValidateRequestData<T extends object>(dtoType: ClassConstructor<T>, req: Request): Promise<T> {
     const requestObject: T = plainToClass(dtoType, req.body);
     await validateOrThrow(requestObject);
     return requestObject;
@@ -39,13 +39,14 @@ export async function parseAndValidateRequestData<T extends object>(dtoType: Cla
  */
 function _recursiveMapValidationErrorMessages(validationErrs: ValidationErrorCv[], messagePrefix = ''): string[] {
     const messages = validationErrs.filter(ve => ve.constraints)
-        .map(ve => Object.values(ve.constraints))
+        .map(ve => ve.constraints as {[type: string]: string})
+        .map(constraints => Object.values(constraints))
         .flat()
         .map(msg => `${messagePrefix}${msg}`);
 
     return messages.concat(
         validationErrs.filter(ve => ve.children)
-            .map(ve => _recursiveMapValidationErrorMessages(ve.children, `${messagePrefix}${ve.property}/`))
+            .map(ve => _recursiveMapValidationErrorMessages(ve.children as ValidationErrorCv[], `${messagePrefix}${ve.property}/`))
             .flat()
     );
 }

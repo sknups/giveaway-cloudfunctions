@@ -12,7 +12,7 @@ const CONFIG: ConfigFragment<BaseConfig> = {
     },
     load: (envConfig: NodeJS.Dict<string>): BaseConfig => {
         return {
-            logLevel: envConfig.LOG_LEVEL,
+            logLevel: envConfig.LOG_LEVEL || 'debug',
         };
     },
 };

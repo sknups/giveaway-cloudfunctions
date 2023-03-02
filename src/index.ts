@@ -11,6 +11,7 @@ import { functionWrapper } from './helpers/wrapper';
 import { GetGiveaway } from './functions/get-giveaway';
 import { UpdateStateGiveaway } from './functions/update-state-giveaway';
 import { SaveGiveaway } from './functions/save-giveaway';
+import { CreateClaim } from './functions/create-claim';
 
 const CONFIG: Promise<AllConfig> = loadConfig(process.env);
 CONFIG.catch(logger.error);
@@ -18,6 +19,7 @@ CONFIG.catch(logger.error);
 export const getGiveaway: HttpFunction = async (req, res) => functionWrapper(GetGiveaway.handler, req, res, CONFIG);
 export const saveGiveaway: HttpFunction = async (req, res) => functionWrapper(SaveGiveaway.handler, req, res, CONFIG);
 export const updateStateGiveaway: HttpFunction = async (req, res) => functionWrapper(UpdateStateGiveaway.handler, req, res, CONFIG);
+export const createClaim: HttpFunction = async (req, res) => functionWrapper(CreateClaim.handler, req, res, CONFIG);
 
 /**
  * For dev testing only
@@ -35,6 +37,9 @@ export const devRouter: HttpFunction = async (req, res) => {
             break;
         case 'giveaway-get':
             await getGiveaway(req, res);
+            break;
+        case 'giveaway-create-claim':
+            await createClaim(req, res);
             break;
         default:
             res.status(404).send(`Endpoint ${req.path} not found\n`);

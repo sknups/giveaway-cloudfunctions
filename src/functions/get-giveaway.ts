@@ -29,7 +29,7 @@ export class GetGiveaway {
         }
 
         logger.debug(`Received request for giveaway-get ${pathParams.key}`);
-        const entity: GiveawayEntity = await GetGiveaway.repository.byCode(pathParams.key);
+        const entity: GiveawayEntity | null = await GetGiveaway.repository.byCode(pathParams.key);
 
         if (entity === null) {
             logger.debug(`giveaway with code ${pathParams.key} not found`);
