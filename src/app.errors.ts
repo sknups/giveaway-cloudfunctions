@@ -118,3 +118,19 @@ export const V1_NOT_SUPPORTED = (giveaway: string): ErrorReason => {
         statusCode: StatusCodes.FORBIDDEN,
     }
 }
+
+export const V2_NOT_SUPPORTED = (giveaway: string): ErrorReason => {
+    return {
+        code: 'GIVEAWAY_00506',
+        message: `Claim v2 using claim code not supported for giveaway ${giveaway}`,
+        statusCode: StatusCodes.FORBIDDEN,
+    }
+}
+
+export const CLAIM_CODE_DECODE_ERROR = (claim: string, message: string): ErrorReason => {
+    return {
+        code: 'GIVEAWAY_00507',
+        message: `An error occurred decoding the supplied claim code ${claim} error message: ${message}`,
+        statusCode: StatusCodes.BAD_REQUEST, // Most likely the client sent a bad code, rather than some internal server fault, so status 4xx
+    }
+}

@@ -6,12 +6,12 @@ import { GiveawayEntity } from '../entity/giveaway.entity';
 import { createContext, saveEntity, findEntities, countEntities } from '../helpers/datastore/datastore.helper';
 import logger from '../helpers/logger';
 import { parseAndValidateRequestData } from '../helpers/validation';
-import { ALL_SKUS_OUT_OF_STOCK, ALREADY_CLAIMED, AppError, ENTITY_NOT_FOUND, ITEM_MANUFACTURE_ERROR, LIMIT_REACHED, V1_NOT_SUPPORTED } from '../app.errors';
+import { ALL_SKUS_OUT_OF_STOCK, ALREADY_CLAIMED, AppError, ENTITY_NOT_FOUND, ITEM_MANUFACTURE_ERROR, LIMIT_REACHED, V1_NOT_SUPPORTED, V2_NOT_SUPPORTED } from '../app.errors';
 import { GiveawayConfig, parseConfig } from '../mapper/giveaway-config-json-parser';
 import { ClaimEntity } from '../entity/claim.entity';
 import { createItem, ItemDto } from '../client/item.client';
 import { AllConfig } from '../config/all-config';
-import { decodeClaimV1, sortFortuneSkus } from '../helpers/giveaway';
+import { decodeClaimV1, decodeClaimV2, DropLinkData, sortFortuneSkus } from '../helpers/giveaway';
 import { GiveawayRepository } from '../persistence/giveaway-repository';
 
 const repository = new GiveawayRepository();
@@ -38,11 +38,6 @@ export class CreateClaim {
      **/
     const isLucu = requestDto.claim.length > 100;
 
-    if (!isLucu) {
-      res.status(StatusCodes.FORBIDDEN).send('v2 claim not implemented');
-      return;
-    }
-
     logger.debug(`Received ${isLucu ? 'v1' : 'v2'} request for claim-create for giveaway ${requestDto.giveaway}`);
 
     // Retrieve giveaway data
@@ -52,12 +47,22 @@ export class CreateClaim {
       throw new AppError(ENTITY_NOT_FOUND('giveaway', requestDto.giveaway));
     }
 
-    if (!giveaway.publicKey) {
-      throw new AppError(V1_NOT_SUPPORTED(requestDto.giveaway));
+    // parse/verify claim
+    let dropLinkData: DropLinkData;
+    if (isLucu) {
+      if (!giveaway.publicKey) {
+        throw new AppError(V1_NOT_SUPPORTED(requestDto.giveaway));
+      }
+
+      dropLinkData = await decodeClaimV1(requestDto.giveaway, requestDto.claim, giveaway.publicKey);
+    } else {
+      if (!giveaway.secret) {
+        throw new AppError(V2_NOT_SUPPORTED(requestDto.giveaway));
+      }
+
+      dropLinkData = await decodeClaimV2(requestDto.giveaway, requestDto.claim, giveaway.secret);
     }
 
-    // parse/verify lucu
-    const dropLinkData = await decodeClaimV1(requestDto.giveaway, requestDto.claim, giveaway.publicKey);
     logger.debug(`Proccesing claim with identifier ${dropLinkData.identifier}`);
 
     // Look for existing claim
