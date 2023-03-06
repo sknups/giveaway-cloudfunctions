@@ -121,7 +121,7 @@ GIVEAWAY_CODE="cube-fortune"
 
 SECRET_KEY="492f965d7bbadd4834002a81a73aa44c"
 CLAIM_ID="0"
-CLAIM=$(npx ts-node scripts/create-claim.ts $SECRET_KEY $GIVEAWAY_CODE $CLAIM_ID 2)
+CLAIM=$(npx ts-node scripts/create-claim.ts $SECRET_KEY $GIVEAWAY_CODE $CLAIM_ID)
 USER=devtesting
 
 curl -X POST -H 'Content-Type: application/json' $BASE_URL/giveaway-create-claim -d '{"giveaway":"'$GIVEAWAY_CODE'","user":"'$USER'","claim":"'$CLAIM'"}'
