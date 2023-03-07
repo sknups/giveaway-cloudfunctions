@@ -6,6 +6,7 @@ const simpleFormat = winston.format.printf(({ severity, message, timestamp, stac
 
 const gcpLogFormat = winston.format(info => {
     info.severity = info.level.toUpperCase();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     delete (info as any).level;
     if (!info.stack && info.meta?.stack) {
         info.stack = info.meta.stack;

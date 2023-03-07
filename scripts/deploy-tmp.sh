@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 common_args="--project drm-apps-01-43b0"
 common_args="${common_args} --trigger-http"
 common_args="${common_args} --region=europe-west2"
