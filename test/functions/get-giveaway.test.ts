@@ -33,7 +33,7 @@ describe('function - get-giveaway - retailer', () => {
         await instance(req, res);
 
         expect(res.statusCode).toEqual(StatusCodes.BAD_REQUEST);
-        expect(res._getString()).toContain('giveaway code must be provided in path');
+        expect(res._getString()).toContain('GIVEAWAY_00401');
     });
 
     it('ignores path additional element', async () => {

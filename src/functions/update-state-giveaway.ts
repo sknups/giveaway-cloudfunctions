@@ -5,44 +5,47 @@ import logger from '../helpers/logger';
 import { AppError, ENTITY_NOT_FOUND, NOT_AVAILABLE_TO_RETAILER } from '../app.errors';
 import { InternalGiveawayMapper } from '../mapper/internal/internal-giveaway-mapper';
 import { GiveawayEntity } from '../entity/giveaway.entity';
-import { parsePath } from '../helpers/util';
 import { parseAndValidateRequestData } from '../helpers/validation';
 import { SetGiveawayStateRequestDto } from '../dto/set-giveaway-state-request.dto';
 import { createContext, getEntity, updateEntity } from '../helpers/datastore/datastore.helper';
 
-import { isRetailerRequest } from '../helpers/util';
+import { isRetailerRequest,getCodeFromPathWithOptionalSubResource } from '../helpers/url';
 
 export class UpdateStateGiveaway {
 
     public static repository = createContext('claim');
 
     public static async handler(req: Request, res: Response): Promise<void> {
-        if (req.method != 'POST') {
+
+        const kind = 'giveaway';
+
+        //POST is deprecated 
+        if (req.method != 'PUT' && req.method != 'POST' ) {
             res.status(StatusCodes.METHOD_NOT_ALLOWED).send(`${req.method} not allowed`);
             return;
+        }
+        
+        if (req.method == 'POST' ) {
+          logger.warn('POST support is now deprecated')
         }
 
         if (isRetailerRequest(req)) {
             throw new AppError(NOT_AVAILABLE_TO_RETAILER);
         }
 
-        const pathParams = parsePath(req, res);
-
-        if (!pathParams) {
-            return;
-        }
+        const code = getCodeFromPathWithOptionalSubResource(kind,"state",req);
 
         const requestDto: SetGiveawayStateRequestDto = await parseAndValidateRequestData(SetGiveawayStateRequestDto, req);
 
-        logger.debug(`Received request for giveaway-set-state ${pathParams.key}`);
-        const giveaway: GiveawayEntity | null = await getEntity('giveaway', pathParams.key);
+        logger.debug(`Received request for giveaway-set-state ${code}`);
+        const giveaway: GiveawayEntity | null = await getEntity(kind, code);
         if (!giveaway) {
-            throw new AppError(ENTITY_NOT_FOUND('giveaway', pathParams.key));
+            throw new AppError(ENTITY_NOT_FOUND(kind, code));
           }
 
         giveaway.state = requestDto.state;
 
-        await updateEntity('giveaway', giveaway);
+        await updateEntity(kind, giveaway);
 
         const mapper = new InternalGiveawayMapper();
         const response = await mapper.entityToDto(giveaway);

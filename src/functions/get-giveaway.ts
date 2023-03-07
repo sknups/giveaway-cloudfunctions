@@ -9,8 +9,8 @@ import { InternalGiveawayMapper } from '../mapper/internal/internal-giveaway-map
 import { AllConfig } from 'config/all-config';
 import { GiveawayDto } from '../dto/giveaway.dto';
 import { GiveawayEntity } from '../entity/giveaway.entity';
-import { parsePath } from '../helpers/util';
 import { GiveawayState } from '../dto/giveaway-state.dto';
+import { isRetailerRequest, getCodeFromPath } from '../helpers/url';
 
 export class GetGiveaway {
 
@@ -22,26 +22,24 @@ export class GetGiveaway {
             return;
         }
 
-        const pathParams = parsePath(req, res);
+        const code = getCodeFromPath('giveaway',req);
+        const retailer = isRetailerRequest(req);
 
-        if (!pathParams) {
-            return;
-        }
 
-        logger.debug(`Received request for giveaway-get ${pathParams.key}`);
-        const entity: GiveawayEntity | null = await GetGiveaway.repository.byCode(pathParams.key);
+        logger.debug(`Received request for giveaway-get ${code}`);
+        const entity: GiveawayEntity | null = await GetGiveaway.repository.byCode(code);
 
         if (entity === null) {
-            logger.debug(`giveaway with code ${pathParams.key} not found`);
-            throw new AppError(GIVEAWAY_NOT_FOUND(pathParams.key));
+            logger.debug(`giveaway with code ${code} not found`);
+            throw new AppError(GIVEAWAY_NOT_FOUND(code));
         }
 
-        if (pathParams.retailer && entity.state === GiveawayState.SUSPENDED) {
-            logger.debug(`giveaway with code ${pathParams.key} is suspended`);
-            throw new AppError(GIVEAWAY_NOT_FOUND(pathParams.key));
+        if (retailer && entity.state === GiveawayState.SUSPENDED) {
+            logger.debug(`giveaway with code ${code} is suspended`);
+            throw new AppError(GIVEAWAY_NOT_FOUND(code));
         }
 
-        const mapper = pathParams.retailer ? new RetailerGiveawayMapper(config.flexUrl) : new InternalGiveawayMapper();
+        const mapper = retailer ? new RetailerGiveawayMapper(config.flexUrl) : new InternalGiveawayMapper();
 
         const giveaway: GiveawayDto = await mapper.entityToDto(entity);
 

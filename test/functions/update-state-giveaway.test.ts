@@ -26,7 +26,7 @@ async function _sendRequest(
 ): Promise<MockExpressResponse> {
     const body = { ..._testBody(), ...bodyOverrides };
     bodyModifier(body);
-    const req = { path: `/${code}`, method: 'POST', body } as Request;
+    const req = { path: `/${code}`, method: 'PUT', body } as Request;
     const res = new MockExpressResponse();
     await instance(req, res);
     return res;
@@ -55,18 +55,18 @@ describe('function - giveaway-update-state', () => {
 
     it('asserts giveaway code required in path', async () => {
         const body = { state: 'SUSPENDED' };
-        const req = { path: '/', method: 'POST', body: body } as Request;
+        const req = { path: '/', method: 'PUT', body: body } as Request;
         const res = new MockExpressResponse();
 
         await instance(req, res);
 
         expect(res.statusCode).toEqual(StatusCodes.BAD_REQUEST);
-        expect(res._getString()).toContain('giveaway code must be provided in path');
+        expect(res._getString()).toContain('GIVEAWAY_00401');
     });
 
     it('asserts retailers can not call', async () => {
         const body = { state: 'SUSPENDED' };
-        const req = { path: '/retailer/TEST', method: 'POST', body: body } as Request;
+        const req = { path: '/retailer/TEST', method: 'PUT', body: body } as Request;
         const res = new MockExpressResponse();
 
         await instance(req, res);
@@ -94,6 +94,26 @@ describe('function - giveaway-update-state', () => {
 
         const res = await _sendRequest(body);
 
+        expect(res.statusCode).toEqual(StatusCodes.OK);
+        expect(mocks.datastoreHelper.getEntity).toBeCalledTimes(1);
+    });
+
+    it('asserts POST still supported', async () => {
+        const req = { path: `/test-giveaway`, method: 'POST', body: { state: 'SUSPENDED' } } as Request;
+        const res = new MockExpressResponse();
+ 
+        await instance(req, res);
+ 
+        expect(res.statusCode).toEqual(StatusCodes.OK);
+        expect(mocks.datastoreHelper.getEntity).toBeCalledTimes(1);
+    });
+
+    it('asserts state sub resource supported', async () => {
+        const req = { path: `/test-giveaway/state`, method: 'PUT', body: { state: 'SUSPENDED' } } as Request;
+        const res = new MockExpressResponse();
+ 
+        await instance(req, res);
+ 
         expect(res.statusCode).toEqual(StatusCodes.OK);
         expect(mocks.datastoreHelper.getEntity).toBeCalledTimes(1);
     });

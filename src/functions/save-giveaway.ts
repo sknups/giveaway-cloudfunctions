@@ -6,7 +6,7 @@ import { InternalGiveawayMapper } from '../mapper/internal/internal-giveaway-map
 import { SaveGiveawayRequestDto } from '../dto/save-giveaway-request.dto';
 import { saveInTransaction } from '../helpers/crud';
 import { createContext } from '../helpers/datastore/datastore.helper';
-import { isRetailerRequest } from '../helpers/util';
+import { isRetailerRequest } from '../helpers/url';
 
 export class SaveGiveaway {
 

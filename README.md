@@ -82,7 +82,7 @@ If updating a giveaway. the state will be unchanged
 BASE_URL=http://localhost:8080
 GIVEAWAY_CODE=octahedron
 
-curl -X PUT -H 'Content-Type: application/json' $BASE_URL/giveaway-save/test -d '{"title":"Test Giveaway", "description": "test", "type": "SIMPLE", "config": "{'skuEntries':[{'code':'TEST-OCTAHEDRON-GIVEAWAY','"weight"':null}]}", "publicKey": "test"}'
+curl -X PUT -H 'Content-Type: application/json' $BASE_URL/giveaway-save/$GIVEAWAY_CODE -d '{"title":"Test Giveaway", "description": "test", "type": "SIMPLE", "config": "{'skuEntries':[{'code':'TEST-OCTAHEDRON-GIVEAWAY','"weight"':null}]}", "publicKey": "test"}'
 ```
 
 ### giveaway-update-state
@@ -93,7 +93,7 @@ Update giveaway state (internal):
 BASE_URL=http://localhost:8080
 GIVEAWAY_CODE=octahedron
 
-curl -X POST -H 'Content-Type: application/json' $BASE_URL/giveaway-update-state/$GIVEAWAY_CODE -d '{"state": "ACTIVE"}'
+curl -X PUT -H 'Content-Type: application/json' $BASE_URL/giveaway-update-state/$GIVEAWAY_CODE -d '{"state": "ACTIVE"}'
 ```
 
 ### giveaway-create-claim (v1)
