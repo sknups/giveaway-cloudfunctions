@@ -1,6 +1,6 @@
 import { Request } from '@google-cloud/functions-framework';
 import { ClassConstructor } from 'class-transformer';
-import { AppError, CODE_NOT_FOUND_IN_PATH, HTTP_METHOD_NOT_ALLOWED, ENTITY_NOT_FOUND } from '../app.errors';
+import { AppError, HTTP_METHOD_NOT_ALLOWED, ENTITY_NOT_FOUND } from '../app.errors';
 import { SaveResponseDto } from '../dto/save-response.dto';
 import { EntityMapper } from '../mapper/entity.mapper';
 import { BaseEntity } from './persistence/base.entity';
@@ -8,16 +8,7 @@ import { commitTransaction, getEntity, rollbackTransaction, saveEntity, startTra
 import { diffPartial } from './diff';
 import logger from './logger';
 import { parseAndValidateRequestData } from './validation';
-
-export function getCodeFromPath(kind: string, req: Request): string {
-    const code: string | undefined = req.path.split('/').pop();
-
-    if (!code || code.length === 0) {
-        throw new AppError(CODE_NOT_FOUND_IN_PATH(kind));
-    }
-
-    return code;
-}
+import { getCodeFromPath } from './url';
 
 /**
  * Generic helper to process a "get" request and return a mapped DTO.
