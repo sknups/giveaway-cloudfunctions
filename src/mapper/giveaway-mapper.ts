@@ -10,6 +10,10 @@ export abstract class AbstractGiveawayMapper<T extends GiveawayDto> implements E
     return 'giveaway';
   }
 
+  excludeFromIndexes(): string[] {
+    return ['config', 'publicKey'];
+  }
+
   public entityToDto(entity: GiveawayEntity): Promise<T> {
     const baseDto: GiveawayDto = this.toBaseDto(entity);
     return this.toDtoFromBaseDto(entity, baseDto);
