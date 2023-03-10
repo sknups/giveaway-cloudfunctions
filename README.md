@@ -12,6 +12,11 @@ To execute locally, you will need:
     * Install (https://cloud.google.com/sdk/docs/install-sdk)
     * Authorization to access the development project
 
+### Auth
+```bash
+npm run auth
+```
+
 ### Install Dependencies
 
 ```bash

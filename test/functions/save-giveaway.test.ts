@@ -207,7 +207,8 @@ describe('function - save-giveaway', () => {
                 secret: TEST_GIVEAWAY_KEY,
                 state: 'ACTIVE'
             },
-            STUB_TX
+            STUB_TX,
+            ['config', 'publicKey']
         );
     });
 
@@ -235,7 +236,8 @@ describe('function - save-giveaway', () => {
                 secret: TEST_GIVEAWAY_KEY,
                 state: 'ACTIVE'
             },
-            STUB_TX
+            STUB_TX,
+            ['config', 'publicKey']
         );
     });
 
@@ -263,7 +265,8 @@ describe('function - save-giveaway', () => {
                 secret: null,
                 state: 'ACTIVE'
             },
-            STUB_TX
+            STUB_TX,
+            ['config', 'publicKey']
         );
     });
 
@@ -285,7 +288,8 @@ describe('function - save-giveaway', () => {
             code: 'test-giveaway',
             state: GiveawayState.ACTIVE,
             secret: TEST_GIVEAWAY_KEY,
-        }, STUB_TX);
+        }, STUB_TX,
+        ['config', 'publicKey']);
     });
 
     it('asserts not-modified giveaway does not update datastore and returns 200', async () => {

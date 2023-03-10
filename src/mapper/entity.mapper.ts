@@ -18,6 +18,11 @@ export interface EntityMapper<E extends BaseEntity, S, F> {
   entityKind(): string;
 
   /**
+   * @returns names of entities for which automatic indexing should be disabled
+   */
+  excludeFromIndexes(): string[];
+
+  /**
    * Converts an entity into a DTO
    * 
    * @param entity the entity to be mapped to a DTO.

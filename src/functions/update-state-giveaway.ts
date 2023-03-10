@@ -7,17 +7,20 @@ import { InternalGiveawayMapper } from '../mapper/internal/internal-giveaway-map
 import { GiveawayEntity } from '../entity/giveaway.entity';
 import { parseAndValidateRequestData } from '../helpers/validation';
 import { SetGiveawayStateRequestDto } from '../dto/set-giveaway-state-request.dto';
-import { createContext, getEntity, updateEntity } from '../helpers/datastore/datastore.helper';
+import { createContext, getEntity, startTransaction, updateEntity } from '../helpers/datastore/datastore.helper';
 
-import { isRetailerRequest,getCodeFromPathWithOptionalSubResource } from '../helpers/url';
+import { isRetailerRequest, getCodeFromPathWithOptionalSubResource } from '../helpers/url';
 
 export class UpdateStateGiveaway {
 
     public static repository = createContext('claim');
 
+    public static mapper =  new InternalGiveawayMapper();
+
     public static async handler(req: Request, res: Response): Promise<void> {
 
-        const kind = 'giveaway';
+        const kind = UpdateStateGiveaway.mapper.entityKind();
+        const excludeFromIndexes = UpdateStateGiveaway.mapper.excludeFromIndexes();
 
         //POST is deprecated 
         if (req.method != 'PUT' && req.method != 'POST' ) {
@@ -45,10 +48,11 @@ export class UpdateStateGiveaway {
 
         giveaway.state = requestDto.state;
 
-        await updateEntity(kind, giveaway);
+        const tx = await startTransaction();
 
-        const mapper = new InternalGiveawayMapper();
-        const response = await mapper.entityToDto(giveaway);
+        await updateEntity(kind, giveaway, tx, excludeFromIndexes);
+
+        const response = await UpdateStateGiveaway.mapper.entityToDto(giveaway);
 
         res.status(StatusCodes.OK).json(response);
     }
