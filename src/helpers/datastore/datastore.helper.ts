@@ -123,16 +123,16 @@ export async function rollbackTransaction(tx: TransactionWrapper): Promise<void>
     await (tx.tx as Transaction).rollback();
 }
 
-export async function saveEntity(kind: string, entity: BaseEntity, tx?: TransactionWrapper): Promise<void> {
+export async function saveEntity(kind: string, entity: BaseEntity, tx?: TransactionWrapper, excludeFromIndexes?: string[]): Promise<void> {
     const ds = _datastoreOrTx(tx);
 
-    await ds.save(_mapToDatastoreEntity(kind, entity));
+    await ds.save(_mapToDatastoreEntity(kind, entity, excludeFromIndexes));
 }
 
-export async function updateEntity(kind: string, entity: BaseEntity, tx?: TransactionWrapper): Promise<void> {
+export async function updateEntity(kind: string, entity: BaseEntity, tx?: TransactionWrapper, excludeFromIndexes?: string[]): Promise<void> {
     const ds = _datastoreOrTx(tx);
 
-    const temp = _mapToDatastoreEntity(kind, entity)
+    const temp = _mapToDatastoreEntity(kind, entity, excludeFromIndexes)
 
     await ds.update(temp);
 }
@@ -162,10 +162,11 @@ function _mapFromDatastoreEntity<T extends BaseEntity>(entity: Entity): T {
     return mapped as T;
 }
 
-function _mapToDatastoreEntity(kind: string, obj: BaseEntity) {
+function _mapToDatastoreEntity(kind: string, obj: BaseEntity, excludeFromIndexes?: string[]) {
 
     const datastoreEntity = {
         key: datastore().key([kind, obj.code]), // use obj.code as the datastore key
+        excludeFromIndexes,
         data: { ...obj } as { code?: string },
     };
     delete datastoreEntity.data.code; // we don't want to persist the key as an additional 'code' column

@@ -83,6 +83,7 @@ export async function saveInTransaction<
     }
 
     const kind = mapper.entityKind();
+    const excludeFromIndexes = mapper.excludeFromIndexes();
     const code: string = getCodeFromPath(kind, req);
 
     const dto = await parseAndValidateRequestData(dtoType, req);
@@ -114,7 +115,7 @@ export async function saveInTransaction<
                     ...entity, // take the current entity
                     ...diff.newValues, // apply the detected differences
                 };
-                await saveEntity(kind, entity, tx);
+                await saveEntity(kind, entity, tx, excludeFromIndexes);
 
                 updated = true;
             }
@@ -122,7 +123,7 @@ export async function saveInTransaction<
             logger.info(`Creating ${kind} ${code}`);
 
             entity = await mapper.dtoToNewEntity(code, dto);
-            await saveEntity(kind, entity, tx);
+            await saveEntity(kind, entity, tx, excludeFromIndexes);
 
             created = true;
         }
