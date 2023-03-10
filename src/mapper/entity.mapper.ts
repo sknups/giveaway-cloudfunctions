@@ -18,9 +18,7 @@ export interface EntityMapper<E extends BaseEntity, S, F> {
   entityKind(): string;
 
   /**
-   * Determines what values to not index.
-   * 
-   * @returns the excluded entities
+   * @returns names of entities for which automatic indexing should be disabled
    */
   excludeFromIndexes(): string[];
 

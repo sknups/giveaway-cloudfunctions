@@ -115,7 +115,7 @@ export async function saveInTransaction<
                     ...entity, // take the current entity
                     ...diff.newValues, // apply the detected differences
                 };
-                await saveEntity(kind, entity, tx, excludeFromIndexes); // send excluded properties
+                await saveEntity(kind, entity, tx, excludeFromIndexes);
 
                 updated = true;
             }
@@ -123,7 +123,7 @@ export async function saveInTransaction<
             logger.info(`Creating ${kind} ${code}`);
 
             entity = await mapper.dtoToNewEntity(code, dto);
-            await saveEntity(kind, entity, tx, excludeFromIndexes); //send excluded properties
+            await saveEntity(kind, entity, tx, excludeFromIndexes);
 
             created = true;
         }
