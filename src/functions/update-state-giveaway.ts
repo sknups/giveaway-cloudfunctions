@@ -7,13 +7,11 @@ import { InternalGiveawayMapper } from '../mapper/internal/internal-giveaway-map
 import { GiveawayEntity } from '../entity/giveaway.entity';
 import { parseAndValidateRequestData } from '../helpers/validation';
 import { SetGiveawayStateRequestDto } from '../dto/set-giveaway-state-request.dto';
-import { createContext, getEntity, startTransaction, updateEntity } from '../helpers/datastore/datastore.helper';
+import { commitTransaction, getEntity, startTransaction, updateEntity } from '../helpers/datastore/datastore.helper';
 
 import { isRetailerRequest, getCodeFromPathWithOptionalSubResource } from '../helpers/url';
 
 export class UpdateStateGiveaway {
-
-    public static repository = createContext('claim');
 
     public static mapper =  new InternalGiveawayMapper();
 
@@ -22,12 +20,12 @@ export class UpdateStateGiveaway {
         const kind = UpdateStateGiveaway.mapper.entityKind();
         const excludeFromIndexes = UpdateStateGiveaway.mapper.excludeFromIndexes();
 
-        //POST is deprecated 
+        //POST is deprecated
         if (req.method != 'PUT' && req.method != 'POST' ) {
             res.status(StatusCodes.METHOD_NOT_ALLOWED).send(`${req.method} not allowed`);
             return;
         }
-        
+
         if (req.method == 'POST' ) {
           logger.warn('POST support is now deprecated')
         }
@@ -51,6 +49,8 @@ export class UpdateStateGiveaway {
         const tx = await startTransaction();
 
         await updateEntity(kind, giveaway, tx, excludeFromIndexes);
+
+        await commitTransaction(tx);
 
         const response = await UpdateStateGiveaway.mapper.entityToDto(giveaway);
 
