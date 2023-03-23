@@ -3,22 +3,22 @@ import { Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { CreateClaimRequestDto } from '../dto/create-claim-request.dto';
 import { GiveawayEntity } from '../entity/giveaway.entity';
-import { createContext, saveEntity, findEntities, countEntities } from '../helpers/datastore/datastore.helper';
+import { saveEntity, countEntities } from '../helpers/datastore/datastore.helper';
 import logger from '../helpers/logger';
 import { parseAndValidateRequestData } from '../helpers/validation';
 import { ALL_SKUS_OUT_OF_STOCK, AppError, ENTITY_NOT_FOUND, ITEM_MANUFACTURE_ERROR, LIMIT_REACHED, V1_NOT_SUPPORTED, V2_NOT_SUPPORTED } from '../app.errors';
 import { GiveawayConfig, parseConfig } from '../mapper/giveaway-config-json-parser';
 import { ClaimEntity } from '../entity/claim.entity';
-import { createItem, getItem, ItemDto } from '../client/item.client';
+import { createItem, getItemForRetailer, ItemDto } from '../client/item.client';
 import { AllConfig } from '../config/all-config';
 import { decodeClaimV1, decodeClaimV2, DropLinkData, sortFortuneSkus } from '../helpers/giveaway';
 import { GiveawayRepository } from '../persistence/giveaway-repository';
-
-const repository = new GiveawayRepository();
+import { ClaimRepository } from '../persistence/claim-repository';
 
 export class CreateClaim {
 
-  public static repository = createContext('claim');
+  public static giveawayRepository = new GiveawayRepository();
+  public static claimRepository = new ClaimRepository();
 
   public static async handler(req: Request, res: Response, config: AllConfig): Promise<void> {
     if (req.method != 'POST') {
@@ -41,7 +41,7 @@ export class CreateClaim {
     logger.debug(`Received ${isLucu ? 'v1' : 'v2'} request for claim-create for giveaway ${requestDto.giveaway}`);
 
     // Retrieve giveaway data
-    const giveaway: GiveawayEntity | null = await repository.byCode(requestDto.giveaway);
+    const giveaway: GiveawayEntity | null = await CreateClaim.giveawayRepository.byCode(requestDto.giveaway);
 
     if (!giveaway || giveaway.state != 'ACTIVE') {
       throw new AppError(ENTITY_NOT_FOUND('giveaway', requestDto.giveaway));
@@ -63,24 +63,17 @@ export class CreateClaim {
       dropLinkData = await decodeClaimV2(requestDto.giveaway, requestDto.claim, giveaway.secret);
     }
 
-    logger.debug(`Proccesing claim with identifier ${dropLinkData.identifier}`);
+    logger.debug(`Processing claim with identifier ${dropLinkData.identifier}`);
 
     // Look for existing claim
-    const result = await findEntities(
-      'claim',
-      [
-        { name: 'dropLinkIdentifier', op: '=', val: dropLinkData.identifier },
-        { name: 'giveawayCode', op: '=', val: requestDto.giveaway },
-        { name: 'user', op: '=', val: requestDto.user },
-      ],
-    );
+    const result = await CreateClaim.claimRepository.findExisting(dropLinkData.identifier,requestDto.giveaway,requestDto.user);
 
-    if (result.length > 0) {
-      const item: ItemDto = await getItem(
+    if (result !=null) {
+      const item = await getItemForRetailer(
         config,
-        result[0].code
+        'SKN', //We don't know which platform. 
+        result.code
       );
-
 
       res.status(StatusCodes.OK).json(item);
       return;
@@ -88,13 +81,7 @@ export class CreateClaim {
 
     // Check claim limit not exceeded
     if (dropLinkData.limit) {
-      const count = await countEntities(
-        'claim',
-        [
-          { name: 'dropLinkIdentifier', op: '=', val: dropLinkData.identifier },
-          { name: 'giveawayCode', op: '=', val: requestDto.giveaway },
-        ],
-      );
+      const count = await CreateClaim.claimRepository.count(dropLinkData.identifier,requestDto.giveaway)
 
       if (count >= dropLinkData.limit) {
         throw new AppError(LIMIT_REACHED(dropLinkData.limit, requestDto.giveaway, dropLinkData.identifier));

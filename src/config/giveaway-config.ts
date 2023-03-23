@@ -12,7 +12,7 @@ const CONFIG: ConfigFragment<GiveawayConfig> = {
         CF_BASE_URL: Joi.string().required(),
         FLEX_URL: Joi.string().required(),
         ITEM_CREATE_FUNCTION: Joi.string().optional().default('item-create'),
-        ITEM_GET_FUNCTION: Joi.string().optional().default('item-get/retailer/SKN')
+        ITEM_GET_FUNCTION: Joi.string().optional().default('item-get')
     },
     load: (envConfig: NodeJS.Dict<string>): GiveawayConfig => {
         const baseUrl = envConfig.CF_BASE_URL;
