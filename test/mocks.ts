@@ -16,6 +16,7 @@ const datastoreHelper = {
 
 const itemClient = {
   createItem: jest.fn(),
+  getItem: jest.fn()
 }
 
 export const mocks = {
