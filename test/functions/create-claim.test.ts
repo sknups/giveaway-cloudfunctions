@@ -412,17 +412,6 @@ describe('function - create-claim', () => {
       expect(res.statusCode).toEqual(StatusCodes.FORBIDDEN);
       expect(mocks.itemClient.createItem).toHaveBeenCalledTimes(0);
     });
-
-    it('claim duplicate returns 403 FORBIDDEN', async () => {
-      // Mock some return data for findEntities, which is used to determine whether a claim exists
-      mocks.datastoreHelper.findEntities.mockReturnValue([{ somedata: 'somedata' }]);
-
-      await instance(req, res);
-
-      expect(res._getJSON()).toMatchObject({ code: 'GIVEAWAY_00500' });
-      expect(res.statusCode).toEqual(StatusCodes.FORBIDDEN);
-      expect(mocks.itemClient.createItem).toHaveBeenCalledTimes(0);
-    });
   });
 
 });

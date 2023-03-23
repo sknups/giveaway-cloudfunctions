@@ -71,14 +71,6 @@ export const NOT_AVAILABLE_TO_RETAILER: ErrorReason = {
     statusCode: StatusCodes.FORBIDDEN,
 }
 
-export const ALREADY_CLAIMED = (giveaway: string, dropLinkIdentifier: string): ErrorReason => {
-    return {
-        code: 'GIVEAWAY_00500',
-        message: `User has already claimed giveaway ${giveaway} with drop link id ${dropLinkIdentifier}`,
-        statusCode: StatusCodes.FORBIDDEN,
-    }
-}
-
 export const LIMIT_REACHED = (limit: number, giveaway: string, dropLinkIdentifier: string): ErrorReason => {
     return {
         code: 'GIVEAWAY_00501',

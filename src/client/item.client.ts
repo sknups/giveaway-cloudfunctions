@@ -5,6 +5,7 @@ import { httpClient } from '../helpers/http';
 export type ItemDto = {
   token: string;
   sku: string;
+  alreadyClaimed?: boolean;
 }
 
 export type CreateItemRequestDto = {
@@ -30,4 +31,16 @@ export async function createItem(data: CreateItemRequestDto, cfg: AllConfig): Pr
   }
   return resp.data;
 
+}
+
+export async function getItem(cfg: AllConfig, code: string): Promise<ItemDto> {
+
+  const client = await httpClient(cfg.itemGetUrl);
+
+  const resp: GaxiosResponse<ItemDto> = await client.request({
+    url: `${cfg.itemGetUrl}/${code}`,
+    method: 'GET'
+  });
+
+  return resp.data;
 }
