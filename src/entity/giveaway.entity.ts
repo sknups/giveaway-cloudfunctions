@@ -14,3 +14,10 @@ export type GiveawayEntityData = {
 }
 
 export type GiveawayEntity = BaseEntity & GiveawayEntityData & GiveawayEntityStateData;
+
+
+export type ClaimEntity = BaseEntity & {
+  dropLinkIdentifier: string;
+  giveawayCode: string;
+  user: string;
+}
