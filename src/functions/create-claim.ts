@@ -81,9 +81,9 @@ export class CreateClaim {
         result[0].code
       );
 
-      item.alreadyClaimed = true;
 
-      res.status(StatusCodes.CREATED).json(item);
+      res.status(StatusCodes.OK).json(item);
+      return;
     }
 
     // Check claim limit not exceeded

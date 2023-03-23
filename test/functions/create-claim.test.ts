@@ -412,6 +412,19 @@ describe('function - create-claim', () => {
       expect(res.statusCode).toEqual(StatusCodes.FORBIDDEN);
       expect(mocks.itemClient.createItem).toHaveBeenCalledTimes(0);
     });
+
+    it('claim duplicate returns 200 OK', async () => {
+      // Mock some return data for findEntities, which is used to determine whether a claim exists
+      mocks.datastoreHelper.findEntities.mockReturnValue([{ somedata: 'somedata', code: 'code' }]);
+      mocks.itemClient.getItem.mockReturnValue({ sku: 'TEST-TETRAHEDRON-GIVEAWAY', token: 'aaaaa11111' });
+
+      await instance(req, res);
+
+      expect(res._getJSON()).toMatchObject({ sku: 'TEST-TETRAHEDRON-GIVEAWAY', token: 'aaaaa11111' });
+      expect(res.statusCode).toEqual(StatusCodes.OK);
+      expect(mocks.itemClient.createItem).toHaveBeenCalledTimes(0);
+      expect(mocks.itemClient.getItem).toHaveBeenCalledTimes(1);
+    });
   });
 
 });

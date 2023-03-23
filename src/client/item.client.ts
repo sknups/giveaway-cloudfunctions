@@ -5,7 +5,6 @@ import { httpClient } from '../helpers/http';
 export type ItemDto = {
   token: string;
   sku: string;
-  alreadyClaimed?: boolean;
 }
 
 export type CreateItemRequestDto = {
