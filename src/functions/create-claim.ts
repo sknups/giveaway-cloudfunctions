@@ -9,7 +9,7 @@ import { parseAndValidateRequestData } from '../helpers/validation';
 import { ALL_SKUS_OUT_OF_STOCK, AppError, ENTITY_NOT_FOUND, ITEM_MANUFACTURE_ERROR, LIMIT_REACHED, V1_NOT_SUPPORTED, V2_NOT_SUPPORTED } from '../app.errors';
 import { GiveawayConfig, parseConfig } from '../mapper/giveaway-config-json-parser';
 import { ClaimEntity } from '../entity/claim.entity';
-import { createItem, getItem, ItemDto } from '../client/item.client';
+import { createItem, getItemForRetailer, ItemDto } from '../client/item.client';
 import { AllConfig } from '../config/all-config';
 import { decodeClaimV1, decodeClaimV2, DropLinkData, sortFortuneSkus } from '../helpers/giveaway';
 import { GiveawayRepository } from '../persistence/giveaway-repository';
@@ -75,9 +75,11 @@ export class CreateClaim {
       ],
     );
 
-    if (result.length > 0) {
-      const item: ItemDto = await getItem(
+
+    if (result !=null) {
+      const item = await getItemForRetailer(
         config,
+        'SKN', //We don't know which platform. 
         result[0].code
       );
 

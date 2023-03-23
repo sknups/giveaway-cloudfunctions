@@ -32,13 +32,12 @@ export async function createItem(data: CreateItemRequestDto, cfg: AllConfig): Pr
 
 }
 
-export async function getItem(cfg: AllConfig, code: string): Promise<ItemDto> {
+export async function getItemForRetailer(cfg: AllConfig, platform: string, code: string): Promise<ItemDto> {
 
   const client = await httpClient(cfg.itemGetUrl);
 
   const resp: GaxiosResponse<ItemDto> = await client.request({
-    url: `${cfg.itemGetUrl}/${code}`,
-    method: 'GET'
+    url: `${cfg.itemGetUrl}/retailer/${platform}/${code}`
   });
 
   return resp.data;
