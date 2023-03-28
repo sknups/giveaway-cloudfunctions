@@ -1,6 +1,7 @@
 import { AllConfig } from '../config/all-config';
 import { GaxiosResponse } from 'gaxios';
 import { httpClient } from '../helpers/http';
+import { StatusCodes } from 'http-status-codes';
 
 export type ItemDto = {
   token: string;
@@ -32,13 +33,20 @@ export async function createItem(data: CreateItemRequestDto, cfg: AllConfig): Pr
 
 }
 
-export async function getItemForRetailer(cfg: AllConfig, platform: string, code: string): Promise<ItemDto> {
+export async function getItemForRetailer(cfg: AllConfig, platform: string, code: string): Promise<ItemDto|null> {
 
   const client = await httpClient(cfg.itemGetUrl);
 
-  const resp: GaxiosResponse<ItemDto> = await client.request({
-    url: `${cfg.itemGetUrl}/retailer/${platform}/${code}`
-  });
-
-  return resp.data;
+  try {
+    const resp: GaxiosResponse<ItemDto> = await client.request({
+      url: `${cfg.itemGetUrl}/retailer/${platform}/${code}`
+    });
+    return resp.data;
+  } catch (e) {
+    if (e.response?.status === StatusCodes.NOT_FOUND) {
+      return null;
+    } 
+    throw e;
+    
+  }
 }
