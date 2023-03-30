@@ -3,7 +3,7 @@ import { Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { CreateClaimRequestDto } from '../dto/create-claim-request.dto';
 import { GiveawayEntity } from '../entity/giveaway.entity';
-import { saveEntity, countEntities } from '../helpers/datastore/datastore.helper';
+import { saveEntity } from '../helpers/datastore/datastore.helper';
 import logger from '../helpers/logger';
 import { parseAndValidateRequestData } from '../helpers/validation';
 import { ALL_SKUS_OUT_OF_STOCK, AppError, ENTITY_NOT_FOUND, ITEM_MANUFACTURE_ERROR, LIMIT_REACHED, V1_NOT_SUPPORTED, V2_NOT_SUPPORTED } from '../app.errors';
@@ -11,7 +11,8 @@ import { GiveawayConfig, parseConfig } from '../mapper/giveaway-config-json-pars
 import { ClaimEntity } from '../entity/claim.entity';
 import { createItem, getItemForRetailer, ItemDto } from '../client/item.client';
 import { AllConfig } from '../config/all-config';
-import { decodeClaimV1, decodeClaimV2, DropLinkData, sortFortuneSkus } from '../helpers/giveaway';
+import { DropLinkData } from '../helpers/drop-links';
+import { decodeClaimV1, decodeClaimV2, sortFortuneSkus } from '../helpers/giveaway';
 import { GiveawayRepository } from '../persistence/giveaway-repository';
 import { ClaimRepository } from '../persistence/claim-repository';
 

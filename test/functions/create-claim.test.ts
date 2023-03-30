@@ -8,40 +8,31 @@ import * as fs from 'fs';
 import { ItemDto } from '../../src/client/item.client';
 import { TEST_GIVEAWAY_KEY } from '../test-data-entities';
 import { ClaimEntity } from '../../src/entity/claim.entity';
-const droplinksLegacy = import('@sknups/drop-links-legacy');
-const droplinks = import('@sknups/drop-links');
+import { createLimitedDropLink, createLimitedDropLinkLegacy, createUnrestrictedDropLink, createUnrestrictedDropLinkLegacy } from '../../src/helpers/drop-links';
 
-async function _createUnrestrictedLucu(keyFile: string, giveaway: string, identifier: string) {
-
-  const key = fs.readFileSync(keyFile).toString();
-  const lib = await droplinksLegacy;
-  const dropLink = lib.LegacyDropLinks.createUnrestrictedDropLink(key, giveaway, identifier);
-  return dropLink.lucu;
-
-};
-
-async function _createLimitedLucu(keyFile: string, giveaway: string, identifier: string, limit: number) {
+async function _createUnrestrictedLucu(keyFile: string, giveaway: string, identifier: string): Promise<string> {
 
   const key = fs.readFileSync(keyFile).toString();
-  const lib = await droplinksLegacy;
-  const dropLink = lib.LegacyDropLinks.createLimitedDropLink(key, giveaway, identifier, limit);
-  return dropLink.lucu;
+  return await createUnrestrictedDropLinkLegacy(key, giveaway, identifier);
 
 };
 
-async function _createUnrestrictedClaim(key: string, giveaway: string, identifier?: number) {
+async function _createLimitedLucu(keyFile: string, giveaway: string, identifier: string, limit: number): Promise<string> {
 
-  const lib = await droplinks;
-  const dropLink = lib.DropLinks.createUnrestrictedDropLink(key, giveaway, identifier);
-  return dropLink.claim;
+  const key = fs.readFileSync(keyFile).toString();
+  return await createLimitedDropLinkLegacy(key, giveaway, identifier, limit);
 
 };
 
-async function _createLimitedClaim(key: string, giveaway: string, limit: number, identifier?: number) {
+async function _createUnrestrictedClaim(key: string, giveaway: string, identifier?: number): Promise<string> {
 
-  const lib = await droplinks;
-  const dropLink = lib.DropLinks.createLimitedDropLink(key, giveaway, identifier, limit);
-  return dropLink.claim;
+  return await createUnrestrictedDropLink(key, giveaway, identifier);
+
+};
+
+async function _createLimitedClaim(key: string, giveaway: string, limit: number, identifier?: number): Promise<string> {
+
+  return await createLimitedDropLink(key, giveaway, identifier, limit);
 
 };
 
