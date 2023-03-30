@@ -1,15 +1,13 @@
-const droplinks = import('@sknups/drop-links');
+import { createLimitedDropLink, createUnrestrictedDropLink } from '../src/helpers/drop-links';
 
 async function main(key: string, giveaway: string, identifier: number, limit?: number) {
 
-  const lib = await droplinks;
-
   if (limit) {
-    const dropLink = lib.DropLinks.createLimitedDropLink(key, giveaway, identifier, limit);
-    console.log(dropLink.claim);
+    const claim = await createLimitedDropLink(key, giveaway, identifier, limit);
+    console.log(claim);
   } else {
-    const dropLink = lib.DropLinks.createUnrestrictedDropLink(key, giveaway, identifier);
-    console.log(dropLink.claim);
+    const claim = await createUnrestrictedDropLink(key, giveaway, identifier);
+    console.log(claim);
   }
 
 }

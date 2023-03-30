@@ -1,4 +1,4 @@
-import { ClaimEntity, GiveawayEntity } from '../entity/giveaway.entity';
+import { ClaimEntity } from '../entity/giveaway.entity';
 import { countEntities, createContext, findEntities } from '../helpers/datastore/datastore.helper';
 import logger from '../helpers/logger';
 

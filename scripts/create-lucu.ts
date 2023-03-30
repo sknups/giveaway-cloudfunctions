@@ -1,17 +1,16 @@
 import * as fs from 'fs';
-const droplinksLegacy = import('@sknups/drop-links-legacy');
+import { createLimitedDropLinkLegacy, createUnrestrictedDropLinkLegacy } from '../src/helpers/drop-links';
 
 async function main(keyFile: string, giveaway: string, identifier: string, limit?: number) {
 
   const key = fs.readFileSync(keyFile).toString();
-  const lib = await droplinksLegacy;
 
   if (limit) {
-    const dropLink = lib.LegacyDropLinks.createLimitedDropLink(key, giveaway, identifier, limit);
-    console.log(dropLink.lucu);
+    const lucu = await createLimitedDropLinkLegacy(key, giveaway, identifier, limit);
+    console.log(lucu);
   } else {
-    const dropLink = lib.LegacyDropLinks.createUnrestrictedDropLink(key, giveaway, identifier);
-    console.log(dropLink.lucu);
+    const lucu = await createUnrestrictedDropLinkLegacy(key, giveaway, identifier);
+    console.log(lucu);
   }
 
 }
