@@ -11,6 +11,10 @@
     "deploy": "scripts/deploy-tmp.sh",
     "delete": "scripts/delete-tmp.sh"
   },
+  "engines": {
+    "node": "18",
+    "npm": "9"
+  },
   "dependencies": {
     "@google-cloud/datastore": "^7.0.0",
     "@google-cloud/functions-framework": "^3.1.3",
