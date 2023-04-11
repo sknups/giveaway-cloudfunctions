@@ -12,8 +12,8 @@
     "delete": "scripts/delete-tmp.sh"
   },
   "engines": {
-    "node": "18",
-    "npm": "9"
+    "node": ">=18.14.2",
+    "npm": ">=9.5.0"
   },
   "dependencies": {
     "@google-cloud/datastore": "^7.0.0",
