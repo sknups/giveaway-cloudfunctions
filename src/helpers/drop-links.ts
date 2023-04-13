@@ -40,15 +40,28 @@ export async function decode(giveaway: string, claim: string, key: string): Prom
 
   let result: DropLinkData;
 
-  const hexIdentifier = dropLink.identifier.toString(16);
 
   if (dropLink instanceof lib.UnrestrictedDropLink) {
-    result = {
-      identifier: `unrestricted-${hexIdentifier}`,
+    if (dropLink.identifier === 0) {
+      // So strong is our assumption that a campaign will have at most one Unlimited Drop Link,
+      // we special case the serialized Drop Link Identifier to not have a suffix.
+      return {
+        identifier: 'unlimited',
+      }
+    } else {
+      // Technically, a campaign could have multiple Unlimited Drop Links.
+      // The data structure of a Unlimited Drop Link allocates 4 bits for an identifier.
+      // However, we don't advertise this possibility - it's just future-proofing.
+      // This might remain a dead code path.
+      const hex = dropLink.identifier.toString(16);
+      result = {
+        identifier: `unlimited-${hex}`,
+      }
     }
   } else {
+    const hex = dropLink.identifier.toString(16);
     result = {
-      identifier: `limited-${hexIdentifier.padStart(5, '0')}`,
+      identifier: `limited-${hex.padStart(5, '0')}`,
       limit: dropLink.limit,
     }
   }
