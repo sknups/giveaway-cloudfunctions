@@ -198,7 +198,7 @@ describe('function - create-claim', () => {
       expect(mocks.itemClient.createItem).toHaveBeenCalledTimes(1);
       expect(mocks.datastoreHelper.saveEntity).toHaveBeenLastCalledWith(
         'claim',
-        _claimEntity({ dropLinkIdentifier: 'unrestricted-0' }),
+        _claimEntity({ dropLinkIdentifier: 'unlimited' }),
       );
       expect(mocks.datastoreHelper.saveEntity).toHaveBeenCalledTimes(1);
     });
@@ -215,7 +215,7 @@ describe('function - create-claim', () => {
       expect(mocks.itemClient.createItem).toHaveBeenCalledTimes(1);
       expect(mocks.datastoreHelper.saveEntity).toHaveBeenLastCalledWith(
         'claim',
-        _claimEntity({ dropLinkIdentifier: 'unrestricted-f' }),
+        _claimEntity({ dropLinkIdentifier: 'unlimited-f' }),
       );
       expect(mocks.datastoreHelper.saveEntity).toHaveBeenCalledTimes(1);
     });
