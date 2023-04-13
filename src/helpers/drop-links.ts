@@ -46,7 +46,7 @@ export async function decode(giveaway: string, claim: string, key: string): Prom
       // So strong is our assumption that a campaign will have at most one Unlimited Drop Link,
       // we special case the serialized Drop Link Identifier to not have a suffix.
       return {
-        identifier: 'unrestricted',
+        identifier: 'unlimited',
       }
     } else {
       // Technically, a campaign could have multiple Unlimited Drop Links.
@@ -55,7 +55,7 @@ export async function decode(giveaway: string, claim: string, key: string): Prom
       // This might remain a dead code path.
       const hex = dropLink.identifier.toString(16);
       result = {
-        identifier: `unrestricted-${hex}`,
+        identifier: `unlimited-${hex}`,
       }
     }
   } else {
