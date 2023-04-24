@@ -114,8 +114,8 @@ export class CreateClaim {
       try {
         item = await createItem(
           {
-            claimCode: requestDto.giveaway,
-            skuCode: sku,
+            giveaway: requestDto.giveaway,
+            sku,
             user: requestDto.user,
           },
           config,
