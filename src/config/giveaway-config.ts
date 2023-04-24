@@ -11,7 +11,7 @@ const CONFIG: ConfigFragment<GiveawayConfig> = {
     schema: {
         CF_BASE_URL: Joi.string().required(),
         FLEX_URL: Joi.string().required(),
-        ITEM_CREATE_FUNCTION: Joi.string().optional().default('item-create'),
+        ITEM_CREATE_FUNCTION: Joi.string().optional().default('item-create-from-drop-link'),
         ITEM_GET_FUNCTION: Joi.string().optional().default('item-get')
     },
     load: (envConfig: NodeJS.Dict<string>): GiveawayConfig => {
