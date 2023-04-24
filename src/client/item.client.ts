@@ -9,11 +9,11 @@ export type ItemDto = {
 }
 
 export type CreateItemRequestDto = {
-  skuCode: string;
+  sku: string;
 
   user: string;
 
-  claimCode: string;
+  giveaway: string;
 }
 
 export async function createItem(data: CreateItemRequestDto, cfg: AllConfig): Promise<ItemDto> {

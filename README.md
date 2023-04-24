@@ -122,9 +122,9 @@ Performs a claim on a given giveaway using a claim code (v2 droplink).
 
 ```bash
 BASE_URL=http://localhost:8080
-GIVEAWAY_CODE="cube-fortune"
+GIVEAWAY_CODE="premium-octahedron"
 
-SECRET_KEY="492f965d7bbadd4834002a81a73aa44c"
+SECRET_KEY="00000000000000000000000000000000"
 CLAIM_ID="0"
 CLAIM=$(npx ts-node scripts/create-claim.ts $SECRET_KEY $GIVEAWAY_CODE $CLAIM_ID)
 USER=devtesting
