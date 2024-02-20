@@ -12,6 +12,8 @@ import { TEST_GIVEAWAY_KEY } from '../test-data-entities';
 
 http('giveaway-save', saveGiveaway);
 
+const TEST_PUBLIC_KEY = '-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzooSe3/zX9AC6Pe0h9+v\n6WazUblC2MDf5QEjzdVMKs9cK/xJK3uz/yzfetbLv1XUtSnLQpmkSwlrb+GbidUu\nHxyZMPnUXrcPHAw9nJC+9L7+ICjSKMzKQn0mNws0Jq2bVj6+U5A6b5TnMsrzq91t\nQXw415uidu+qzDV+xmFfHN0jT4w63hV+jcwKSMrtXQs2NE0MxuRENbNr9bogsYP8\nSXdxCDgg2WFCKIZzE0K13hJTKjqJm1PhnJU44PFCj/bZfdv4yHBXNiTEM5kZ9GxU\n2+fTKZJgXLyy5EUV2jzj7Y5objSA9vbkYkKX/R98CnxYEMs64r5zNW4ft2kINpOx\nWwIDAQAB\n-----END PUBLIC KEY-----';
+
 let instance: HttpFunction;
 
 function _testBody(): any {
@@ -21,7 +23,6 @@ function _testBody(): any {
         description: 'Claim your free SKN now',
         type: GiveawayType.SIMPLE,
         config: '{"skuEntries":[{"code":"TEST-TETRAHEDRON-GIVEAWAY","weight":null}]}',
-        publicKey: '-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzooSe3/zX9AC6Pe0h9+v\n6WazUblC2MDf5QEjzdVMKs9cK/xJK3uz/yzfetbLv1XUtSnLQpmkSwlrb+GbidUu\nHxyZMPnUXrcPHAw9nJC+9L7+ICjSKMzKQn0mNws0Jq2bVj6+U5A6b5TnMsrzq91t\nQXw415uidu+qzDV+xmFfHN0jT4w63hV+jcwKSMrtXQs2NE0MxuRENbNr9bogsYP8\nSXdxCDgg2WFCKIZzE0K13hJTKjqJm1PhnJU44PFCj/bZfdv4yHBXNiTEM5kZ9GxU\n2+fTKZJgXLyy5EUV2jzj7Y5objSA9vbkYkKX/R98CnxYEMs64r5zNW4ft2kINpOx\nWwIDAQAB\n-----END PUBLIC KEY-----',
         secret: TEST_GIVEAWAY_KEY,
     };
     return body;
@@ -203,7 +204,7 @@ describe('function - save-giveaway', () => {
                 description: 'Claim your free SKN now',
                 type: 'SIMPLE',
                 config: '{"skuEntries":[{"code":"TEST-TETRAHEDRON-GIVEAWAY","weight":null}]}',
-                publicKey: '-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzooSe3/zX9AC6Pe0h9+v\n6WazUblC2MDf5QEjzdVMKs9cK/xJK3uz/yzfetbLv1XUtSnLQpmkSwlrb+GbidUu\nHxyZMPnUXrcPHAw9nJC+9L7+ICjSKMzKQn0mNws0Jq2bVj6+U5A6b5TnMsrzq91t\nQXw415uidu+qzDV+xmFfHN0jT4w63hV+jcwKSMrtXQs2NE0MxuRENbNr9bogsYP8\nSXdxCDgg2WFCKIZzE0K13hJTKjqJm1PhnJU44PFCj/bZfdv4yHBXNiTEM5kZ9GxU\n2+fTKZJgXLyy5EUV2jzj7Y5objSA9vbkYkKX/R98CnxYEMs64r5zNW4ft2kINpOx\nWwIDAQAB\n-----END PUBLIC KEY-----',
+                publicKey: null,
                 secret: TEST_GIVEAWAY_KEY,
                 state: 'ACTIVE'
             },
@@ -242,7 +243,7 @@ describe('function - save-giveaway', () => {
     });
 
     it('asserts new giveaway without secret returns 201', async () => {
-        const res = await _sendRequest({}, body => delete body.secret, 'TEST-NEW-GIVEAWAY');
+        const res = await _sendRequest({ publicKey: TEST_PUBLIC_KEY }, body => delete body.secret, 'TEST-NEW-GIVEAWAY');
 
         expect(res.statusCode).toEqual(StatusCodes.CREATED);
         expect(res._getJSON().created).toEqual(true);
@@ -261,7 +262,7 @@ describe('function - save-giveaway', () => {
                 description: 'Claim your free SKN now',
                 type: 'SIMPLE',
                 config: '{"skuEntries":[{"code":"TEST-TETRAHEDRON-GIVEAWAY","weight":null}]}',
-                publicKey: '-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzooSe3/zX9AC6Pe0h9+v\n6WazUblC2MDf5QEjzdVMKs9cK/xJK3uz/yzfetbLv1XUtSnLQpmkSwlrb+GbidUu\nHxyZMPnUXrcPHAw9nJC+9L7+ICjSKMzKQn0mNws0Jq2bVj6+U5A6b5TnMsrzq91t\nQXw415uidu+qzDV+xmFfHN0jT4w63hV+jcwKSMrtXQs2NE0MxuRENbNr9bogsYP8\nSXdxCDgg2WFCKIZzE0K13hJTKjqJm1PhnJU44PFCj/bZfdv4yHBXNiTEM5kZ9GxU\n2+fTKZJgXLyy5EUV2jzj7Y5objSA9vbkYkKX/R98CnxYEMs64r5zNW4ft2kINpOx\nWwIDAQAB\n-----END PUBLIC KEY-----',
+                publicKey: TEST_PUBLIC_KEY,
                 secret: null,
                 state: 'ACTIVE'
             },
@@ -285,6 +286,7 @@ describe('function - save-giveaway', () => {
         expect(mocks.datastoreHelper.rollbackTransaction).toBeCalledTimes(0);
         expect(mocks.datastoreHelper.saveEntity).toBeCalledWith('giveaway', {
             ...giveawayUpdates,
+            publicKey: null,
             code: 'test-giveaway',
             state: GiveawayState.ACTIVE,
             secret: TEST_GIVEAWAY_KEY,

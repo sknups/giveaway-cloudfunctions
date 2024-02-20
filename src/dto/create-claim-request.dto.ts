@@ -17,10 +17,7 @@ export class CreateClaimRequestDto {
   user: string;
 
   /**
-   * The claim data required to perform a claim.
-   * 
-   * - For a v1 giveaway this will be a lucu
-   * - For a v2 giveaway this will be a claim code
+   * The claim code.
    */
   @IsString()
   @IsNotEmpty()

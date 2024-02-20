@@ -6,13 +6,13 @@ import { GiveawayEntity } from '../entity/giveaway.entity';
 import { saveEntity } from '../helpers/datastore/datastore.helper';
 import logger from '../helpers/logger';
 import { parseAndValidateRequestData } from '../helpers/validation';
-import { ALL_SKUS_OUT_OF_STOCK, AppError, ENTITY_NOT_FOUND, ITEM_MANUFACTURE_ERROR, LIMIT_REACHED, V1_NOT_SUPPORTED, V2_NOT_SUPPORTED } from '../app.errors';
+import { ALL_SKUS_OUT_OF_STOCK, AppError, ENTITY_NOT_FOUND, ITEM_MANUFACTURE_ERROR, LIMIT_REACHED } from '../app.errors';
 import { GiveawayConfig, parseConfig } from '../mapper/giveaway-config-json-parser';
 import { ClaimEntity } from '../entity/claim.entity';
 import { createItem, getItemForRetailer, ItemDto } from '../client/item.client';
 import { AllConfig } from '../config/all-config';
 import { DropLinkData } from '../helpers/drop-links';
-import { decodeClaimV1, decodeClaimV2, sortFortuneSkus } from '../helpers/giveaway';
+import { decodeClaimV2, sortFortuneSkus } from '../helpers/giveaway';
 import { GiveawayRepository } from '../persistence/giveaway-repository';
 import { ClaimRepository } from '../persistence/claim-repository';
 
@@ -29,47 +29,24 @@ export class CreateClaim {
 
     const requestDto: CreateClaimRequestDto = await parseAndValidateRequestData(CreateClaimRequestDto, req);
 
-    /**
-     * Attempt to auto detect whether a v1 or v2 giveaway is being claimed.
-     * 
-     * A lucu (v1) is typically VERY long, much longer than 100 characters.
-     * A claim code (v2) is typically reasonably short, much less than 100 characters.
-     * 
-     * Current expectation for v2 length is that it will be 26 characters or lower.
-     **/
-    const isLucu = requestDto.claim.length > 100;
-
-    logger.debug(`Received ${isLucu ? 'v1' : 'v2'} request for claim-create for giveaway ${requestDto.giveaway}`);
+    logger.debug(`Received request for claim-create for giveaway ${requestDto.giveaway}`);
 
     // Retrieve giveaway data
     const giveaway: GiveawayEntity | null = await CreateClaim.giveawayRepository.byCode(requestDto.giveaway);
 
-    if (!giveaway || giveaway.state != 'ACTIVE') {
+    if (!giveaway || giveaway.state != 'ACTIVE' || !giveaway.secret) {
       throw new AppError(ENTITY_NOT_FOUND('giveaway', requestDto.giveaway));
     }
 
     // parse/verify claim
-    let dropLinkData: DropLinkData;
-    if (isLucu) {
-      if (!giveaway.publicKey) {
-        throw new AppError(V1_NOT_SUPPORTED(requestDto.giveaway));
-      }
-
-      dropLinkData = await decodeClaimV1(requestDto.giveaway, requestDto.claim, giveaway.publicKey);
-    } else {
-      if (!giveaway.secret) {
-        throw new AppError(V2_NOT_SUPPORTED(requestDto.giveaway));
-      }
-
-      dropLinkData = await decodeClaimV2(requestDto.giveaway, requestDto.claim, giveaway.secret);
-    }
+    const dropLinkData: DropLinkData = await decodeClaimV2(requestDto.giveaway, requestDto.claim, giveaway.secret);
 
     logger.debug(`Processing claim with identifier ${dropLinkData.identifier}`);
 
     // Look for existing claim
-    const result = await CreateClaim.claimRepository.findExisting(dropLinkData.identifier,requestDto.giveaway,requestDto.user);
+    const result = await CreateClaim.claimRepository.findExisting(dropLinkData.identifier, requestDto.giveaway, requestDto.user);
 
-    if (result !=null) {
+    if (result != null) {
       const item = await getItemForRetailer(
         config,
         'SKN', //We don't know which platform. 
@@ -82,7 +59,7 @@ export class CreateClaim {
 
     // Check claim limit not exceeded
     if (dropLinkData.limit) {
-      const count = await CreateClaim.claimRepository.count(dropLinkData.identifier,requestDto.giveaway)
+      const count = await CreateClaim.claimRepository.count(dropLinkData.identifier, requestDto.giveaway)
 
       if (count >= dropLinkData.limit) {
         throw new AppError(LIMIT_REACHED(dropLinkData.limit, requestDto.giveaway, dropLinkData.identifier));

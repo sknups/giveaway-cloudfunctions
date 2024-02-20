@@ -23,7 +23,6 @@
  *
  * Limited testing suggests only accessing the ESM modules through this helper resolves the issue.
  */
-const droplinksLegacy = import('@sknups/drop-links-legacy');
 const droplinks = import('@sknups/drop-links');
 
 export type DropLinkData = {
@@ -85,38 +84,5 @@ export async function createLimitedDropLink(key: string, giveaway: string, ident
   const dropLink = lib.DropLinks.createLimitedDropLink(key, giveaway, identifier, limit);
 
   return dropLink.claim;
-
-}
-
-export async function decodeLegacy(giveaway: string, key: string, lucu: string): Promise<DropLinkData> {
-
-  const lib = await droplinksLegacy;
-  const dropLink = lib.LegacyDropLinks.decode(giveaway, key, lucu);
-
-  const result: DropLinkData = { identifier: dropLink.identifier };
-
-  if (dropLink instanceof lib.LimitedLegacyDropLink) {
-    result.limit = dropLink.limit;
-  }
-
-  return result;
-
-}
-
-export async function createUnrestrictedDropLinkLegacy(key: string, giveaway: string, identifier: string): Promise<string> {
-
-  const lib = await droplinksLegacy;
-  const dropLink = lib.LegacyDropLinks.createUnrestrictedDropLink(key, giveaway, identifier);
-
-  return dropLink.lucu;
-
-}
-
-export async function createLimitedDropLinkLegacy(key: string, giveaway: string, identifier: string, limit: number): Promise<string> {
-
-  const lib = await droplinksLegacy;
-  const dropLink = lib.LegacyDropLinks.createLimitedDropLink(key, giveaway, identifier, limit);
-
-  return dropLink.lucu;
 
 }

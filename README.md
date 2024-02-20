@@ -62,7 +62,7 @@ Get by giveaway code (internal):
 
 ```bash
 BASE_URL=http://localhost:8080
-GIVEAWAY_CODE=octahedron
+GIVEAWAY_CODE=cube-simple
 
 curl $BASE_URL/giveaway-get/$GIVEAWAY_CODE
 ```
@@ -71,7 +71,7 @@ Get by giveaway code (retailer):
 
 ```bash
 BASE_URL=http://localhost:8080
-GIVEAWAY_CODE=octahedron
+GIVEAWAY_CODE=cube-simple
 
 curl $BASE_URL/giveaway-get/retailer/$GIVEAWAY_CODE
 ```
@@ -96,24 +96,11 @@ Update giveaway state (internal):
 
 ```bash
 BASE_URL=http://localhost:8080
-GIVEAWAY_CODE=octahedron
+GIVEAWAY_CODE=cube-simple
+
+curl -X PUT -H 'Content-Type: application/json' $BASE_URL/giveaway-update-state/$GIVEAWAY_CODE -d '{"state": "SUSPENDED"}'
 
 curl -X PUT -H 'Content-Type: application/json' $BASE_URL/giveaway-update-state/$GIVEAWAY_CODE -d '{"state": "ACTIVE"}'
-```
-
-### giveaway-create-claim (v1)
-
-Performs a claim on a given giveaway using a lucu (legacy v1 droplink).
-
-```bash
-BASE_URL=http://localhost:8080
-GIVEAWAY_CODE="cube-fortune"
-
-LUCU_ID="TEST$(date +%s)"
-LUCU=$(npx ts-node scripts/create-lucu.ts dev-pem/$GIVEAWAY_CODE.pem $GIVEAWAY_CODE $LUCU_ID 2)
-USER=devtesting
-
-curl -X POST -H 'Content-Type: application/json' $BASE_URL/giveaway-create-claim -d '{"giveaway":"'$GIVEAWAY_CODE'","user":"'$USER'","claim":"'$LUCU'"}'
 ```
 
 ### giveaway-create-claim (v2)

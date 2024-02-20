@@ -1,6 +1,6 @@
-import { AppError, CLAIM_CODE_DECODE_ERROR, LUCU_DECODE_ERROR } from '../app.errors';
+import { AppError, CLAIM_CODE_DECODE_ERROR } from '../app.errors';
 import { SkuEntry } from '../mapper/giveaway-config-json-parser';
-import { decode, decodeLegacy, DropLinkData } from './drop-links';
+import { decode, DropLinkData } from './drop-links';
 
 /**
  * Given a list of weighted SKU, sorts them randomly with a bias towards the weight.
@@ -64,19 +64,6 @@ export type ClaimDecoder = (
   claim: string,
   key: string,
 ) => Promise<DropLinkData>;
-
-/**
- * Decodes a v1 drop link (lucu).
- */
-export const decodeClaimV1: ClaimDecoder = async (giveaway, lucu, key) => {
-
-  try {
-    return await decodeLegacy(giveaway, key, lucu);
-  } catch (e) {
-    throw new AppError(LUCU_DECODE_ERROR(e.message), e);
-  }
-
-};
 
 /**
  * Decodes a v2 drop link (claim code).

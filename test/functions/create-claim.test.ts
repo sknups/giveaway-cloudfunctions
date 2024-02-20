@@ -8,21 +8,7 @@ import * as fs from 'fs';
 import { ItemDto } from '../../src/client/item.client';
 import { TEST_GIVEAWAY_KEY } from '../test-data-entities';
 import { ClaimEntity } from '../../src/entity/claim.entity';
-import { createLimitedDropLink, createLimitedDropLinkLegacy, createUnrestrictedDropLink, createUnrestrictedDropLinkLegacy } from '../../src/helpers/drop-links';
-
-async function _createUnrestrictedLucu(keyFile: string, giveaway: string, identifier: string): Promise<string> {
-
-  const key = fs.readFileSync(keyFile).toString();
-  return await createUnrestrictedDropLinkLegacy(key, giveaway, identifier);
-
-};
-
-async function _createLimitedLucu(keyFile: string, giveaway: string, identifier: string, limit: number): Promise<string> {
-
-  const key = fs.readFileSync(keyFile).toString();
-  return await createLimitedDropLinkLegacy(key, giveaway, identifier, limit);
-
-};
+import { createLimitedDropLink, createUnrestrictedDropLink } from '../../src/helpers/drop-links';
 
 async function _createUnrestrictedClaim(key: string, giveaway: string, identifier?: number): Promise<string> {
 
@@ -46,10 +32,8 @@ function _claimEntity(overrides?: Partial<ClaimEntity>): ClaimEntity {
   };
 }
 
-const UNRESTRICTED_LUCU = _createUnrestrictedLucu('dev-pem/tetrahedron.pem', 'test-giveaway', 'test-unrestricted-droplink');
-const UNRESTRICTED_LUCU2 = _createUnrestrictedLucu('dev-pem/tetrahedron.pem', 'test-giveaway2', 'test-unrestricted-droplink');
-const RESTRICTED_LUCU_LIMIT_2 = _createLimitedLucu('dev-pem/tetrahedron.pem', 'test-giveaway', 'test-unrestricted-droplink', 2);
 const UNRESTRICTED_CLAIM = _createUnrestrictedClaim(TEST_GIVEAWAY_KEY, 'test-giveaway');
+const LIMITED_CLAIM_LIMIT_2 = _createLimitedClaim(TEST_GIVEAWAY_KEY, 'test-giveaway', 2, 22222);
 
 describe('function - create-claim', () => {
 
@@ -67,7 +51,7 @@ describe('function - create-claim', () => {
       body: {
         giveaway: 'test-giveaway',
         user: 'test-user',
-        claim: await UNRESTRICTED_LUCU,
+        claim: await UNRESTRICTED_CLAIM,
       },
     } as Request;
     res = new MockExpressResponse();
@@ -160,31 +144,6 @@ describe('function - create-claim', () => {
     });
   });
 
-  describe('drop link v1', () => {
-    it('redeem with lucu returns 201 CREATED', async () => {
-      const dummyDto: ItemDto = { sku: 'TEST-TETRAHEDRON-GIVEAWAY', token: 'aaaaa11111' };
-      mocks.itemClient.createItem.mockReturnValueOnce(dummyDto);
-
-      await instance(req, res);
-
-      expect(res.statusCode).toEqual(StatusCodes.CREATED);
-      expect(mocks.itemClient.createItem).toHaveBeenCalledTimes(1);
-    });
-
-    it('redeem with limited lucu returns 201 CREATED', async () => {
-      const dummyDto: ItemDto = { sku: 'TEST-TETRAHEDRON-GIVEAWAY', token: 'aaaaa11111' };
-      mocks.itemClient.createItem.mockReturnValueOnce(dummyDto);
-      mocks.datastoreHelper.countEntities.mockReturnValue(1);
-
-      req.body.claim = await RESTRICTED_LUCU_LIMIT_2;
-
-      await instance(req, res);
-
-      expect(res.statusCode).toEqual(StatusCodes.CREATED);
-      expect(mocks.itemClient.createItem).toHaveBeenCalledTimes(1);
-    });
-  });
-
   describe('drop link v2', () => {
     it('redeem v2 returns 201 CREATED', async () => {
       const dummyDto: ItemDto = { sku: 'TEST-TETRAHEDRON-GIVEAWAY', token: 'aaaaa11111' };
@@ -257,64 +216,6 @@ describe('function - create-claim', () => {
     });
   });
 
-  describe('drop link v1 - error scenarios', () => {
-    it('malformed lucu returns 400 BAD_REQUEST', async () => {
-      const lucu = await UNRESTRICTED_LUCU;
-      req.body.claim = 'xxxxx' + lucu;
-
-      await instance(req, res);
-
-      expect(res.statusCode).toBe(StatusCodes.BAD_REQUEST);
-    });
-
-    it('giveaway mismatch in lucu returns 400 BAD_REQUEST', async () => {
-      const lucu = await UNRESTRICTED_LUCU2;
-      req.body.claim = lucu;
-
-      await instance(req, res);
-
-      expect(res.statusCode).toBe(StatusCodes.BAD_REQUEST);
-    });
-
-    it('invalid data in lucu returns 400 BAD_REQUEST', async () => {
-      req.body.claim = 'aHR0cHM6Ly9za251cHMvY3ViZS1mb3J0dW5lP2lkPVRFU1QxNjc3NTg4ODkzYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFh';
-
-      await instance(req, res);
-
-      expect(res.statusCode).toBe(StatusCodes.BAD_REQUEST);
-    });
-
-    it('invalid publicKey returns 400 BAD_REQUEST', async () => {
-      req.body.giveaway = 'invalid-public-key';
-      req.body.claim = await _createUnrestrictedLucu('dev-pem/tetrahedron.pem', 'invalid-public-key', 'test-unrestricted-droplink')
-
-      await instance(req, res);
-
-      // This should technicaly be a 5xx error, but the drop links library does not provide sufficient error context to determine the problem
-      expect(res.statusCode).toBe(StatusCodes.BAD_REQUEST);
-    });
-
-    it('null publicKey returns 403 FORBIDDEN', async () => {
-      req.body.giveaway = 'null-public-key';
-      req.body.claim = await _createUnrestrictedLucu('dev-pem/tetrahedron.pem', 'null-public-key', 'test-unrestricted-droplink')
-
-      await instance(req, res);
-
-      expect(res._getJSON()).toMatchObject({ code: 'GIVEAWAY_00505' }); //V1_NOT_SUPPORTED
-      expect(res.statusCode).toBe(StatusCodes.FORBIDDEN);
-    });
-
-    it('invalid signature returns 400 BAD_REQUEST', async () => {
-      const fullLucu: string = await UNRESTRICTED_LUCU;
-      const lucuWithShortenedSig = fullLucu.substring(0, fullLucu.length - 10);
-      req.body.claim = lucuWithShortenedSig;
-
-      await instance(req, res);
-
-      expect(res.statusCode).toBe(StatusCodes.BAD_REQUEST);
-    });
-  });
-
   describe('drop link v2 - error scenarios', () => {
     beforeEach(async () => {
       req.body.claim = await UNRESTRICTED_CLAIM;
@@ -336,7 +237,7 @@ describe('function - create-claim', () => {
       expect(res.statusCode).toBe(StatusCodes.BAD_REQUEST);
     });
 
-    it('invalid data in lucu returns 400 BAD_REQUEST', async () => {
+    it('invalid data in claim code returns 400 BAD_REQUEST', async () => {
       req.body.claim = 'aHR0cHM6Ly9za251cHMvY3ViZS1mb3J0dW5lP2lkPVRFU1QxNjc3NTg4ODkzYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFh';
 
       await instance(req, res);
@@ -354,14 +255,14 @@ describe('function - create-claim', () => {
       expect(res.statusCode).toBe(StatusCodes.BAD_REQUEST);
     });
 
-    it('null secret returns 403 FORBIDDEN', async () => {
+    it('null secret returns 404 NOT_FOUND', async () => {
       req.body.giveaway = 'null-secret-key';
       req.body.claim = await _createUnrestrictedClaim(TEST_GIVEAWAY_KEY, 'null-secret-key');
 
       await instance(req, res);
 
-      expect(res._getJSON()).toMatchObject({ code: 'GIVEAWAY_00506' }); //V2_NOT_SUPPORTED
-      expect(res.statusCode).toBe(StatusCodes.FORBIDDEN);
+      expect(res._getJSON()).toMatchObject({ code: 'GIVEAWAY_00300' }); //ENTITY_NOT_FOUND
+      expect(res.statusCode).toBe(StatusCodes.NOT_FOUND);
     });
 
     it('claim with wrong key returns 400 BAD_REQUEST', async () => {
@@ -385,7 +286,7 @@ describe('function - create-claim', () => {
 
     it('claim inactive giveaway returns 404 NOT_FOUND', async () => {
       req.body.giveaway = 'inactive';
-      req.body.claim = await _createUnrestrictedLucu('dev-pem/tetrahedron.pem', 'inactive', 'test-unrestricted-droplink')
+      req.body.claim = await _createUnrestrictedClaim(TEST_GIVEAWAY_KEY, 'inactive')
 
       await instance(req, res);
 
@@ -395,7 +296,7 @@ describe('function - create-claim', () => {
     it('claim giveaway with exceeded limit returns 403 FORBIDDEN', async () => {
       mocks.datastoreHelper.countEntities.mockReturnValue(2);
 
-      req.body.claim = await RESTRICTED_LUCU_LIMIT_2;
+      req.body.claim = await LIMITED_CLAIM_LIMIT_2;
 
       await instance(req, res);
 

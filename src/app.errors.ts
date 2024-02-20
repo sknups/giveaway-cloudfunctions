@@ -79,14 +79,6 @@ export const LIMIT_REACHED = (limit: number, giveaway: string, dropLinkIdentifie
     }
 }
 
-export const LUCU_DECODE_ERROR = (message: string): ErrorReason => {
-    return {
-        code: 'GIVEAWAY_00502',
-        message: `An error occurred decoding the supplied lucu: ${message}`,
-        statusCode: StatusCodes.BAD_REQUEST, // Most likely the client sent a bad lucu, rather than some internal server fault, so status 4xx
-    }
-}
-
 export const ALL_SKUS_OUT_OF_STOCK = (giveaway: string): ErrorReason => {
     return {
         code: 'GIVEAWAY_00503',
@@ -99,22 +91,6 @@ export const ITEM_MANUFACTURE_ERROR = (giveaway: string, sku: string): ErrorReas
     return {
         code: 'GIVEAWAY_00504',
         message: `Failed to manufacture an item for giveaway ${giveaway} with SKU ${sku}`,
-        statusCode: StatusCodes.FORBIDDEN,
-    }
-}
-
-export const V1_NOT_SUPPORTED = (giveaway: string): ErrorReason => {
-    return {
-        code: 'GIVEAWAY_00505',
-        message: `Claim v1 using lucu not supported for giveaway ${giveaway}`,
-        statusCode: StatusCodes.FORBIDDEN,
-    }
-}
-
-export const V2_NOT_SUPPORTED = (giveaway: string): ErrorReason => {
-    return {
-        code: 'GIVEAWAY_00506',
-        message: `Claim v2 using claim code not supported for giveaway ${giveaway}`,
         statusCode: StatusCodes.FORBIDDEN,
     }
 }
