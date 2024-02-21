@@ -7,19 +7,18 @@ import { GiveawayType } from '../../dto/giveaway-type.dto';
 
 export class InternalGiveawayMapper extends AbstractGiveawayMapper<InternalGiveawayDto> {
 
-     toDtoFromBaseDto(entity: GiveawayEntity, baseDto: GiveawayDto): Promise<InternalGiveawayDto> {
- 
-        const state = GiveawayState[entity.state];
-    
-        return Promise.resolve({
-          ...baseDto,
-          code: entity.code,
-          type: GiveawayType[entity.type],
-          state,
-          config: entity.config,
-          publicKey: entity.publicKey ?? undefined,
-          secret: entity.secret ?? undefined,
-        })
-    }
+  toDtoFromBaseDto(entity: GiveawayEntity, baseDto: GiveawayDto): Promise<InternalGiveawayDto> {
+
+    const state = GiveawayState[entity.state];
+
+    return Promise.resolve({
+      ...baseDto,
+      code: entity.code,
+      type: GiveawayType[entity.type],
+      state,
+      config: entity.config,
+      secret: entity.secret ?? undefined,
+    });
+  }
 
 }

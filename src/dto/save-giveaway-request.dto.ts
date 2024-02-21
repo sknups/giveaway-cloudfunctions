@@ -1,6 +1,5 @@
-import { IsEnum, IsNotEmpty, IsOptional, IsString, ValidateIf } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
 import { GiveawayType } from './giveaway-type.dto';
-
 
 export class SaveGiveawayRequestDto {
 
@@ -22,11 +21,6 @@ export class SaveGiveawayRequestDto {
 
   @IsString()
   @IsNotEmpty()
-  @IsOptional()
-  public readonly publicKey?: string;
+  public readonly secret: string;
 
-  @IsString()
-  @IsNotEmpty()
-  @ValidateIf(o => o.secret !== undefined || !o.publicKey)
-  public readonly secret?: string;
 }

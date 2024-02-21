@@ -8,7 +8,7 @@ import { StatusCodes } from 'http-status-codes';
 import { SaveGiveawayRequestDto } from '../../src/dto/save-giveaway-request.dto';
 import { GiveawayType } from '../../src/dto/giveaway-type.dto';
 import { GiveawayState } from '../../src/dto/giveaway-state.dto';
-import { TEST_GIVEAWAY_KEY } from '../test-data-entities';
+import { TEST_GIVEAWAY_SECRET } from '../test-data-entities';
 
 http('giveaway-save', saveGiveaway);
 
@@ -21,8 +21,7 @@ function _testBody(): any {
         description: 'Claim your free SKN now',
         type: GiveawayType.SIMPLE,
         config: '{"skuEntries":[{"code":"TEST-TETRAHEDRON-GIVEAWAY","weight":null}]}',
-        publicKey: '-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzooSe3/zX9AC6Pe0h9+v\n6WazUblC2MDf5QEjzdVMKs9cK/xJK3uz/yzfetbLv1XUtSnLQpmkSwlrb+GbidUu\nHxyZMPnUXrcPHAw9nJC+9L7+ICjSKMzKQn0mNws0Jq2bVj6+U5A6b5TnMsrzq91t\nQXw415uidu+qzDV+xmFfHN0jT4w63hV+jcwKSMrtXQs2NE0MxuRENbNr9bogsYP8\nSXdxCDgg2WFCKIZzE0K13hJTKjqJm1PhnJU44PFCj/bZfdv4yHBXNiTEM5kZ9GxU\n2+fTKZJgXLyy5EUV2jzj7Y5objSA9vbkYkKX/R98CnxYEMs64r5zNW4ft2kINpOx\nWwIDAQAB\n-----END PUBLIC KEY-----',
-        secret: TEST_GIVEAWAY_KEY,
+        secret: TEST_GIVEAWAY_SECRET,
     };
     return body;
 }
@@ -146,20 +145,6 @@ describe('function - save-giveaway', () => {
             expect(res._getString()).toContain('config must be a string');
         });
 
-        it('asserts publicKey is not empty', async () => {
-            const res = await _sendRequest({ publicKey: '' });
-
-            expect(res.statusCode).toEqual(StatusCodes.BAD_REQUEST);
-            expect(res._getString()).toContain('publicKey should not be empty');
-        });
-
-        it('asserts publicKey is a string', async () => {
-            const res = await _sendRequest({ publicKey: 10 });
-
-            expect(res.statusCode).toEqual(StatusCodes.BAD_REQUEST);
-            expect(res._getString()).toContain('publicKey must be a string');
-        });
-
         it('asserts secret is not empty', async () => {
             const res = await _sendRequest({ secret: '' });
 
@@ -167,8 +152,8 @@ describe('function - save-giveaway', () => {
             expect(res._getString()).toContain('secret should not be empty');
         });
 
-        it('asserts secret is required if publicKey is absent', async () => {
-            const res = await _sendRequest({ publicKey: undefined, secret: undefined });
+        it('asserts secret is required', async () => {
+            const res = await _sendRequest({ secret: undefined });
 
             expect(res.statusCode).toEqual(StatusCodes.BAD_REQUEST);
             expect(res._getString()).toContain('secret should not be empty');
@@ -203,70 +188,11 @@ describe('function - save-giveaway', () => {
                 description: 'Claim your free SKN now',
                 type: 'SIMPLE',
                 config: '{"skuEntries":[{"code":"TEST-TETRAHEDRON-GIVEAWAY","weight":null}]}',
-                publicKey: '-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzooSe3/zX9AC6Pe0h9+v\n6WazUblC2MDf5QEjzdVMKs9cK/xJK3uz/yzfetbLv1XUtSnLQpmkSwlrb+GbidUu\nHxyZMPnUXrcPHAw9nJC+9L7+ICjSKMzKQn0mNws0Jq2bVj6+U5A6b5TnMsrzq91t\nQXw415uidu+qzDV+xmFfHN0jT4w63hV+jcwKSMrtXQs2NE0MxuRENbNr9bogsYP8\nSXdxCDgg2WFCKIZzE0K13hJTKjqJm1PhnJU44PFCj/bZfdv4yHBXNiTEM5kZ9GxU\n2+fTKZJgXLyy5EUV2jzj7Y5objSA9vbkYkKX/R98CnxYEMs64r5zNW4ft2kINpOx\nWwIDAQAB\n-----END PUBLIC KEY-----',
-                secret: TEST_GIVEAWAY_KEY,
+                secret: TEST_GIVEAWAY_SECRET,
                 state: 'ACTIVE'
             },
             STUB_TX,
-            ['config', 'publicKey']
-        );
-    });
-
-    it('asserts new giveaway without publicKey returns 201', async () => {
-        const res = await _sendRequest({}, body => delete body.publicKey, 'TEST-NEW-GIVEAWAY');
-
-        expect(res.statusCode).toEqual(StatusCodes.CREATED);
-        expect(res._getJSON().created).toEqual(true);
-        expect(res._getJSON().updated).toEqual(true);
-
-        expect(mocks.datastoreHelper.getEntity).toBeCalledWith('giveaway', 'TEST-NEW-GIVEAWAY', STUB_TX);
-        expect(mocks.datastoreHelper.startTransaction).toBeCalledTimes(1);
-        expect(mocks.datastoreHelper.commitTransaction).toBeCalledTimes(1);
-        expect(mocks.datastoreHelper.rollbackTransaction).toBeCalledTimes(0);
-
-        expect(mocks.datastoreHelper.saveEntity).toBeCalledWith(
-            'giveaway',
-            {
-                code: 'TEST-NEW-GIVEAWAY',
-                title: 'SKNUPS Giveaway',
-                description: 'Claim your free SKN now',
-                type: 'SIMPLE',
-                config: '{"skuEntries":[{"code":"TEST-TETRAHEDRON-GIVEAWAY","weight":null}]}',
-                publicKey: null,
-                secret: TEST_GIVEAWAY_KEY,
-                state: 'ACTIVE'
-            },
-            STUB_TX,
-            ['config', 'publicKey']
-        );
-    });
-
-    it('asserts new giveaway without secret returns 201', async () => {
-        const res = await _sendRequest({}, body => delete body.secret, 'TEST-NEW-GIVEAWAY');
-
-        expect(res.statusCode).toEqual(StatusCodes.CREATED);
-        expect(res._getJSON().created).toEqual(true);
-        expect(res._getJSON().updated).toEqual(true);
-
-        expect(mocks.datastoreHelper.getEntity).toBeCalledWith('giveaway', 'TEST-NEW-GIVEAWAY', STUB_TX);
-        expect(mocks.datastoreHelper.startTransaction).toBeCalledTimes(1);
-        expect(mocks.datastoreHelper.commitTransaction).toBeCalledTimes(1);
-        expect(mocks.datastoreHelper.rollbackTransaction).toBeCalledTimes(0);
-
-        expect(mocks.datastoreHelper.saveEntity).toBeCalledWith(
-            'giveaway',
-            {
-                code: 'TEST-NEW-GIVEAWAY',
-                title: 'SKNUPS Giveaway',
-                description: 'Claim your free SKN now',
-                type: 'SIMPLE',
-                config: '{"skuEntries":[{"code":"TEST-TETRAHEDRON-GIVEAWAY","weight":null}]}',
-                publicKey: '-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzooSe3/zX9AC6Pe0h9+v\n6WazUblC2MDf5QEjzdVMKs9cK/xJK3uz/yzfetbLv1XUtSnLQpmkSwlrb+GbidUu\nHxyZMPnUXrcPHAw9nJC+9L7+ICjSKMzKQn0mNws0Jq2bVj6+U5A6b5TnMsrzq91t\nQXw415uidu+qzDV+xmFfHN0jT4w63hV+jcwKSMrtXQs2NE0MxuRENbNr9bogsYP8\nSXdxCDgg2WFCKIZzE0K13hJTKjqJm1PhnJU44PFCj/bZfdv4yHBXNiTEM5kZ9GxU\n2+fTKZJgXLyy5EUV2jzj7Y5objSA9vbkYkKX/R98CnxYEMs64r5zNW4ft2kINpOx\nWwIDAQAB\n-----END PUBLIC KEY-----',
-                secret: null,
-                state: 'ACTIVE'
-            },
-            STUB_TX,
-            ['config', 'publicKey']
+            ['config']
         );
     });
 
@@ -287,9 +213,9 @@ describe('function - save-giveaway', () => {
             ...giveawayUpdates,
             code: 'test-giveaway',
             state: GiveawayState.ACTIVE,
-            secret: TEST_GIVEAWAY_KEY,
+            secret: TEST_GIVEAWAY_SECRET,
         }, STUB_TX,
-        ['config', 'publicKey']);
+            ['config']);
     });
 
     it('asserts not-modified giveaway does not update datastore and returns 200', async () => {
