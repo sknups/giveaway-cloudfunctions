@@ -16,7 +16,6 @@ export class InternalGiveawayDto extends GiveawayDto {
     type: GiveawayType;
     state: GiveawayState;
     config: string;
-    publicKey?: string;
-    secret?: string;
+    secret: string;
 
 }

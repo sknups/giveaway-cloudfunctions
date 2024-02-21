@@ -11,7 +11,7 @@ export abstract class AbstractGiveawayMapper<T extends GiveawayDto> implements E
   }
 
   excludeFromIndexes(): string[] {
-    return ['config', 'publicKey'];
+    return ['config'];
   }
 
   public entityToDto(entity: GiveawayEntity): Promise<T> {
@@ -48,7 +48,6 @@ export abstract class AbstractGiveawayMapper<T extends GiveawayDto> implements E
       description: dto.description,
       type: dto.type,
       config: dto.config,
-      publicKey: dto.publicKey ?? null,
       secret: dto.secret ?? null,
     };
   }

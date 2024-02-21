@@ -6,7 +6,7 @@ import { createClaim } from '../../src';
 import { StatusCodes } from 'http-status-codes';
 import * as fs from 'fs';
 import { ItemDto } from '../../src/client/item.client';
-import { TEST_GIVEAWAY_KEY } from '../test-data-entities';
+import { TEST_GIVEAWAY_SECRET } from '../test-data-entities';
 import { ClaimEntity } from '../../src/entity/claim.entity';
 import { createLimitedDropLink, createUnrestrictedDropLink } from '../../src/helpers/drop-links';
 
@@ -32,8 +32,8 @@ function _claimEntity(overrides?: Partial<ClaimEntity>): ClaimEntity {
   };
 }
 
-const UNRESTRICTED_CLAIM = _createUnrestrictedClaim(TEST_GIVEAWAY_KEY, 'test-giveaway');
-const LIMITED_CLAIM_LIMIT_2 = _createLimitedClaim(TEST_GIVEAWAY_KEY, 'test-giveaway', 2, 22222);
+const UNRESTRICTED_CLAIM = _createUnrestrictedClaim(TEST_GIVEAWAY_SECRET, 'test-giveaway');
+const LIMITED_CLAIM_LIMIT_2 = _createLimitedClaim(TEST_GIVEAWAY_SECRET, 'test-giveaway', 2, 22222);
 
 describe('function - create-claim', () => {
 
@@ -166,7 +166,7 @@ describe('function - create-claim', () => {
       const dummyDto: ItemDto = { sku: 'TEST-TETRAHEDRON-GIVEAWAY', token: 'aaaaa11111' };
       mocks.itemClient.createItem.mockReturnValueOnce(dummyDto);
 
-      req.body.claim = await _createUnrestrictedClaim(TEST_GIVEAWAY_KEY, 'test-giveaway', 15);
+      req.body.claim = await _createUnrestrictedClaim(TEST_GIVEAWAY_SECRET, 'test-giveaway', 15);
 
       await instance(req, res);
 
@@ -184,7 +184,7 @@ describe('function - create-claim', () => {
       mocks.itemClient.createItem.mockReturnValueOnce(dummyDto);
       mocks.datastoreHelper.countEntities.mockReturnValue(1);
 
-      req.body.claim = await _createLimitedClaim(TEST_GIVEAWAY_KEY, 'test-giveaway', 2);
+      req.body.claim = await _createLimitedClaim(TEST_GIVEAWAY_SECRET, 'test-giveaway', 2);
 
       await instance(req, res);
 
@@ -202,7 +202,7 @@ describe('function - create-claim', () => {
       mocks.itemClient.createItem.mockReturnValueOnce(dummyDto);
       mocks.datastoreHelper.countEntities.mockReturnValue(1);
 
-      req.body.claim = await _createLimitedClaim(TEST_GIVEAWAY_KEY, 'test-giveaway', 2, 11223);
+      req.body.claim = await _createLimitedClaim(TEST_GIVEAWAY_SECRET, 'test-giveaway', 2, 11223);
 
       await instance(req, res);
 
@@ -230,7 +230,7 @@ describe('function - create-claim', () => {
     });
 
     it('giveaway mismatch in claim code returns 400 BAD_REQUEST', async () => {
-      req.body.claim = await _createUnrestrictedClaim(TEST_GIVEAWAY_KEY, 'test-giveaway-mismatch');
+      req.body.claim = await _createUnrestrictedClaim(TEST_GIVEAWAY_SECRET, 'test-giveaway-mismatch');
 
       await instance(req, res);
 
@@ -247,7 +247,7 @@ describe('function - create-claim', () => {
 
     it('invalid secret returns 400 BAD_REQUEST', async () => {
       req.body.giveaway = 'invalid-secret-key';
-      req.body.claim = await _createUnrestrictedClaim(TEST_GIVEAWAY_KEY, 'invalid-secret-key');
+      req.body.claim = await _createUnrestrictedClaim(TEST_GIVEAWAY_SECRET, 'invalid-secret-key');
 
       await instance(req, res);
 
@@ -257,7 +257,7 @@ describe('function - create-claim', () => {
 
     it('null secret returns 404 NOT_FOUND', async () => {
       req.body.giveaway = 'null-secret-key';
-      req.body.claim = await _createUnrestrictedClaim(TEST_GIVEAWAY_KEY, 'null-secret-key');
+      req.body.claim = await _createUnrestrictedClaim(TEST_GIVEAWAY_SECRET, 'null-secret-key');
 
       await instance(req, res);
 
@@ -266,7 +266,7 @@ describe('function - create-claim', () => {
     });
 
     it('claim with wrong key returns 400 BAD_REQUEST', async () => {
-      const key = '00' + TEST_GIVEAWAY_KEY.substring(2);
+      const key = '00' + TEST_GIVEAWAY_SECRET.substring(2);
       req.body.claim = await _createUnrestrictedClaim(key, 'test-giveaway');
 
       await instance(req, res);
@@ -286,7 +286,7 @@ describe('function - create-claim', () => {
 
     it('claim inactive giveaway returns 404 NOT_FOUND', async () => {
       req.body.giveaway = 'inactive';
-      req.body.claim = await _createUnrestrictedClaim(TEST_GIVEAWAY_KEY, 'inactive')
+      req.body.claim = await _createUnrestrictedClaim(TEST_GIVEAWAY_SECRET, 'inactive')
 
       await instance(req, res);
 

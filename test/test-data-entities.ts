@@ -1,13 +1,12 @@
 import { GiveawayEntity } from '../src/entity/giveaway.entity';
 
-export const TEST_GIVEAWAY_KEY = '492f965d7bbadd4834002a81a73aa44c';
+export const TEST_GIVEAWAY_SECRET = '492f965d7bbadd4834002a81a73aa44c';
 
 const TEST_GIVEAWAY: GiveawayEntity = {
     code: 'test-giveaway',
     config: '{"skuEntries":[{"code":"TEST-TETRAHEDRON-GIVEAWAY","weight":null}]}',
     description: 'Claim your free SKN now',
-    publicKey: null,
-    secret: TEST_GIVEAWAY_KEY,
+    secret: TEST_GIVEAWAY_SECRET,
     state: 'ACTIVE',
     title: 'SKNUPS Giveaway',
     type: 'SIMPLE',

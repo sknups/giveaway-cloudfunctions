@@ -86,8 +86,10 @@ If updating a giveaway. the state will be unchanged
 ```bash
 BASE_URL=http://localhost:8080
 GIVEAWAY_CODE=octahedron
+GIVEAWAY_SKU=TEST-OCTAHEDRON-GIVEAWAY
+GIVEAWAY_SECRET="00000000000000000000000000000000"
 
-curl -X PUT -H 'Content-Type: application/json' $BASE_URL/giveaway-save/$GIVEAWAY_CODE -d '{"title":"Test Giveaway", "description": "test", "type": "SIMPLE", "config": "{'skuEntries':[{'code':'TEST-OCTAHEDRON-GIVEAWAY','"weight"':null}]}", "publicKey": "test"}'
+curl -X PUT -H 'Content-Type: application/json' $BASE_URL/giveaway-save/$GIVEAWAY_CODE -d '{"title":"SKNUPS Giveaway", "description": "Claim your free SKN now", "type": "SIMPLE", "config": "{\"skuEntries\":[{\"code\":\"'$GIVEAWAY_SKU'\",\"weight\":null}]}", "secret": "'$GIVEAWAY_SECRET'"}'
 ```
 
 ### giveaway-update-state
