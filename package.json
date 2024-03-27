@@ -1,5 +1,5 @@
 {
-  "name": "giveaway-cloudfunctions",
+  "name": "@sknups-internal/giveaway-cloudfunctions",
   "main": "dist/index.js",
   "scripts": {
     "precompile": "rimraf ./dist",
@@ -18,7 +18,7 @@
   "dependencies": {
     "@google-cloud/datastore": "^7.0.0",
     "@google-cloud/functions-framework": "^3.1.3",
-    "@sknups/drop-links": "^2.1.0",
+    "@sknups/drop-links": "^2.2.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
     "http-status-codes": "^2.2.0",
