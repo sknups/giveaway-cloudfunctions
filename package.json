@@ -1,19 +1,16 @@
 {
   "name": "@sknups-internal/giveaway-cloudfunctions",
+  "private": true,
+  "author": "SKNUPS",
   "main": "dist/index.js",
   "scripts": {
     "precompile": "rimraf ./dist",
     "compile": "tsc",
-    "start": "tsc -p tsconfig.dev.json && concurrently \"tsc -p tsconfig.dev.json -w\" \"nodemon --watch ./dist --exec GOOGLE_AUTH_TOKEN=$(gcloud auth print-identity-token) NODE_ENV=development functions-framework --target=devRouter\"",
-    "test": "NODE_OPTIONS=\"--experimental-vm-modules --require @nextools/suppress-experimental-warnings\" NODE_ENV=development LOG_LEVEL=error jest --config test/jest-config.json",
-    "lint": "eslint --ext .js,.ts .",
+    "delete": "scripts/delete-tmp.sh",
     "deploy": "scripts/deploy-tmp.sh",
-    "delete": "scripts/delete-tmp.sh"
-  },
-  "private": true,
-  "engines": {
-    "node": ">=18.19.1",
-    "npm": ">=10.2.4"
+    "lint": "eslint --ext .js,.ts .",
+    "start": "tsc -p tsconfig.dev.json && concurrently \"tsc -p tsconfig.dev.json -w\" \"nodemon --watch ./dist --exec GOOGLE_AUTH_TOKEN=$(gcloud auth print-identity-token) NODE_ENV=development functions-framework --target=devRouter\"",
+    "test": "NODE_OPTIONS=\"--experimental-vm-modules --require @nextools/suppress-experimental-warnings\" NODE_ENV=development LOG_LEVEL=error jest --config test/jest-config.json"
   },
   "dependencies": {
     "@google-cloud/datastore": "^7.0.0",
@@ -44,5 +41,9 @@
     "ts-jest": "^29.0.3",
     "ts-node": "^10.9.1",
     "typescript": "^4.9.4"
+  },
+  "engines": {
+    "node": ">=18.19.1",
+    "npm": ">=10.2.4"
   }
 }
